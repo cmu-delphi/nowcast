@@ -1,0 +1,24 @@
+{
+  "type": "delphi deploy config",
+  "version": 1,
+  "actions": [
+
+    "// imports",
+    {"type": "import", "dst": "../nowcast/delphi_epidata.py"},
+    {"type": "import", "dst": "../nowcast/epidate.py"},
+    {"type": "import", "dst": "../nowcast/fluv_utils.py", "name": "epiweek.py"},
+    {"type": "import", "dst": "../nowcast/neldermead.py"},
+    {"type": "import", "dst": "../nowcast/secrets.py"},
+    {"type": "import", "dst": "../nowcast/state_info.py"},
+
+    "// nowcasting sources",
+    {
+      "type": "move",
+      "src": "src/",
+      "dst": "../nowcast/",
+      "match": "^(.+)(\\.py)$",
+      "add-header-comment": true
+    }
+
+  ]
+}
