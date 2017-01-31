@@ -373,14 +373,14 @@ def get_wiki434(location, epiweek, valid):
         # fetch the data from the API
         res = Epidata.wiki(article, epiweeks=weeks, hours=hour)
         epidata = Epidata.check(res)
+        field_name = fields[idx]
+        idx += 1
         # loop over rows of the response, ordered by epiweek
         for row in epidata:
           ew = row['epiweek']
           if ew not in data:
             # make a new entry for this epiweek
             data[ew] = {'epiweek': ew}
-          field_name = fields[idx]
-          idx += 1
           # save the value of this field
           data[ew][field_name] = row['value']
     # convert the map to a list matching the API epidata list
