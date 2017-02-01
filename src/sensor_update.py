@@ -62,7 +62,7 @@ Locations vary by data source, but include all of:
 =================
 
 2017-01-31
-  + experimental wiki fitting
+  + updated `wiki` to use the same fitting procedure as everything else
 2016-12-13
   + use secrets
 2016-04-22
@@ -349,13 +349,6 @@ def get_twtr(location, epiweek, valid):
 def get_wiki(location, epiweek, valid):
   if location != 'nat':
     raise Exception('wiki is only available for nat')
-  fetch = lambda weeks: Epidata.signals(secrets.api.signals, 'wiki', location, weeks)
-  return get_prediction(location, epiweek, 'wiki', 'value', fetch, valid)
-
-
-def get_wiki434(location, epiweek, valid):
-  if location != 'nat':
-    raise Exception('wiki is only available for nat')
   articles = ['human_flu', 'influenza', 'influenza_a_virus', 'influenzavirus_a', 'influenzavirus_c', 'oseltamivir', 'zanamivir']
   hours = [17, 18, 21]
   # There are 21 time series (7 articles, 3 hours) of N epiweeks. Each time
@@ -393,7 +386,7 @@ def get_wiki434(location, epiweek, valid):
       'message': None,
       'epidata': rows,
     }
-  return get_prediction(location, epiweek, 'wiki434', fields, fetch, valid)
+  return get_prediction(location, epiweek, 'wiki', fields, fetch, valid)
 
 
 def get_cdc(location, epiweek, valid):
@@ -461,7 +454,6 @@ def update(sensors, first_week=None, last_week=None, valid=False, test_mode=Fals
             'ght': get_ght,
             'twtr': get_twtr,
             'wiki': get_wiki,
-            'wiki434': get_wiki434,
             'cdc': get_cdc,
             'epic': get_epic,
             'sar3': get_sar3,
