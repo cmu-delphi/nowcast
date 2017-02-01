@@ -61,6 +61,8 @@ Locations vary by data source, but include all of:
 === Changelog ===
 =================
 
+2017-01-31
+  + updated `wiki` to use the same fitting procedure as everything else
 2016-12-13
   + use secrets
 2016-04-22
@@ -347,8 +349,44 @@ def get_twtr(location, epiweek, valid):
 def get_wiki(location, epiweek, valid):
   if location != 'nat':
     raise Exception('wiki is only available for nat')
-  fetch = lambda weeks: Epidata.signals(secrets.api.signals, 'wiki', location, weeks)
-  return get_prediction(location, epiweek, 'wiki', 'value', fetch, valid)
+  articles = ['human_flu', 'influenza', 'influenza_a_virus', 'influenzavirus_a', 'influenzavirus_c', 'oseltamivir', 'zanamivir']
+  hours = [17, 18, 21]
+  # There are 21 time series (7 articles, 3 hours) of N epiweeks. Each time
+  # series needs to be fetched, and then the whole dataset needs to be pivoted
+  # so that there are N rows, each with 21 values.
+  fields = ['f%d' % i for i in range(len(articles) * len(hours))]
+  def fetch(weeks):
+    # a map from epiweeks to a map of field-value pairs (for each article/hour)
+    data = {}
+    # field name index
+    idx = 0
+    # download each time series individually
+    for article in articles:
+      for hour in hours:
+        # fetch the data from the API
+        res = Epidata.wiki(article, epiweeks=weeks, hours=hour)
+        epidata = Epidata.check(res)
+        field_name = fields[idx]
+        idx += 1
+        # loop over rows of the response, ordered by epiweek
+        for row in epidata:
+          ew = row['epiweek']
+          if ew not in data:
+            # make a new entry for this epiweek
+            data[ew] = {'epiweek': ew}
+          # save the value of this field
+          data[ew][field_name] = row['value']
+    # convert the map to a list matching the API epidata list
+    rows = []
+    for ew in sorted(list(data.keys())):
+      rows.append(data[ew])
+    # spoof the API response
+    return {
+      'result': 1,
+      'message': None,
+      'epidata': rows,
+    }
+  return get_prediction(location, epiweek, 'wiki', fields, fetch, valid)
 
 
 def get_cdc(location, epiweek, valid):
