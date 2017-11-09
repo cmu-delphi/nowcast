@@ -18,6 +18,20 @@
       "dst": "../nowcast/",
       "match": "^(.+)(\\.py)$",
       "add-header-comment": true
+    },
+    {
+      "type": "move",
+      "src": "src/sensors/",
+      "dst": "../nowcast/",
+      "match": "^(.+)(\\.py)$",
+      "add-header-comment": true
+    },
+    {
+      "type": "move",
+      "src": "src/truth/",
+      "dst": "../nowcast/",
+      "match": "^(.+)(\\.py)$",
+      "add-header-comment": true
     }
 
   ]
