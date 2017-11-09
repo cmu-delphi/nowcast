@@ -36,15 +36,17 @@ See also:
   + initial version (borrowing heavily from fc_archefilter.py)
 """
 
-# built-in
+# standard library
 import argparse
-# external
+
+# third party
 import numpy as np
-# local
-from archetype import Archetype
-from delphi_epidata import Epidata
-import fluv_utils as EW
-from neldermead import NelderMead
+from undefx.undef_analysis.neldermead import NelderMead
+
+# first party
+from .archetype import Archetype
+from delphi.epidata.client.delphi_epidata import Epidata
+import delphi.utils.epiweek as EW
 
 
 class ARCH:

@@ -93,20 +93,22 @@ Locations vary by data source, but include all of:
   + initial version (based heavily on signal_update.py)
 """
 
-# built-in
+# standard library
 import argparse
 import sys
-# external
+
+# third party
 import mysql.connector
 import numpy as np
-# local
-from arch import ARCH
-from delphi_epidata import Epidata
-from epidate import EpiDate
-import fluv_utils as flu
-from sar3 import SAR3
-import secrets
-from state_info import StateInfo
+
+# first party
+from .arch import ARCH
+from .sar3 import SAR3
+from delphi.epidata.client.delphi_epidata import Epidata
+import delphi.operations.secrets as secrets
+from delphi.utils.epidate import EpiDate
+import delphi.utils.epiweek as flu
+from delphi.utils.state_info import StateInfo
 
 
 def get_most_recent_issue():

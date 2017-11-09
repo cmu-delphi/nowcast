@@ -34,13 +34,15 @@ See also:
   + initial version
 """
 
-# built-in
+# standard library
 import argparse
-# external
+
+# third party
 import numpy as np
-# local
-from delphi_epidata import Epidata
-import fluv_utils as EW
+
+# first party
+from delphi.epidata.client.delphi_epidata import Epidata
+import delphi.utils.epiweek as EW
 
 
 class SAR3:

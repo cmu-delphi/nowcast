@@ -23,12 +23,14 @@ An empirical flu model.
   + First version
 """
 
+# standard library
 from math import floor, ceil
+
+# third party
 import numpy as np
 import numpy.linalg as linalg
 import scipy.stats as stats
-from neldermead import NelderMead
-#from trendfilter_r import trendfilter
+from undefx.undef_analysis.neldermead import NelderMead
 
 
 class Archetype:

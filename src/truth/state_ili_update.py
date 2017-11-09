@@ -37,16 +37,18 @@ ili: imputed ILI
   + initial version
 """
 
-# built-in
+# standard library
 import argparse
-# external
+
+# third party
 import mysql.connector
-# local
-from delphi_epidata import Epidata
-from epidate import EpiDate
-import fluv_utils as flu
-import secrets
-from state_info import StateInfo
+
+# first party
+from delphi.epidata.client.delphi_epidata import Epidata
+import delphi.operations.secrets as secrets
+from delphi.utils.epidate import EpiDate
+import delphi.utils.epiweek as flu
+from delphi.utils.state_info import StateInfo
 
 
 def get_most_recent_issue():

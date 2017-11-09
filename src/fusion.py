@@ -20,7 +20,7 @@ See also: nowcast.py
   + first "real" version (based on various PoC's)
 """
 
-# external
+# third party
 import numpy as np
 
 
