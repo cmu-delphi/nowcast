@@ -332,6 +332,24 @@ def get_ght(location, epiweek, valid):
   return get_prediction(location, epiweek, 'ght', 'value', fetch, valid)
 
 
+def get_ghtj(location, epiweek, valid):
+  loc = 'US' if location == 'nat' else location
+  def justinfun(location, epiweek):
+    main_driver = 'ghtj.R'   ### Need to set an absolute path
+    subprocess.check_call(['Rscript', main_driver, location, epiweek], shell=False)
+    outputdir = '/home/justin/repos/ghtModel/output/' ### Need to set an absolute path
+    prefix = 'ghtpred-'
+    predfilename = outputdir + prefix + '-'+ location +'-' + epiweek + '.txt'
+    file = open(outputdir+prefix+epiweek+'.txt', 'r')
+    mypred = file.read()
+    return mypred
+
+  # Making the single prediction now:
+  mypred = justinfun(location, epiweek)
+  return mypred
+
+
+
 def get_twtr(location, epiweek, valid):
   def fetch(weeks):
     # Impute missing weeks with 0%
@@ -454,6 +472,7 @@ def update(sensors, first_week=None, last_week=None, valid=False, test_mode=Fals
           value = {
             'gft': get_gft,
             'ght': get_ght,
+            'ghtj': get_ghtj,
             'twtr': get_twtr,
             'wiki': get_wiki,
             'cdc': get_cdc,
