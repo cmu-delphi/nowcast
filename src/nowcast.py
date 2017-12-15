@@ -51,7 +51,8 @@ std: nowcast standard deviation
 =================
 === Changelog ===
 =================
-
+2017-12-15
+  + option to run nowcast with quidel
 2016-12-13
   + use secrets
 2016-11-28
@@ -103,6 +104,7 @@ def get_most_recent_issue():
 def get_all_sensors():
   si = StateInfo()
   all_names = ['gft', 'ght', 'twtr', 'wiki', 'cdc', 'epic', 'sar3', 'arch']
+  # all_names = ['gft', 'ght', 'twtr', 'wiki', 'cdc', 'epic', 'sar3', 'arch', 'quid']
   all_loc = si.nat + si.hhs + si.cen[1:] + si.sta
   return (all_names, all_loc)
 
