@@ -21,6 +21,7 @@ The following signals are available:
   - wiki: Wikipedia access
   - cdc: CDC Page Hits
   - epic: Epicast 1-week-ahead point prediction
+  - quid: Flu lab test data
   - sar3: Seasonal Autoregression (order 3)
   - arch: Best-fit Archetype at 1-week-ahead
 
@@ -60,7 +61,8 @@ Locations vary by data source, but include all of:
 =================
 === Changelog ===
 =================
-
+2017-12-15
+  + add `quid` data source
 2017-01-31
   + updated `wiki` to use the same fitting procedure as everything else
 2016-12-13
@@ -409,6 +411,14 @@ def get_epic(location, epiweek, valid):
   return fc['forecast']['data'][location]['x1']['point']
 
 
+def get_quid(location, epiweek, valid):
+  fields = ['value']
+  def fetch(weeks):
+    res = Epidata.quidel(secrets.api.quidel, weeks, location)
+    return res
+  return get_prediction(location, epiweek, 'quid', fields, fetch, valid)
+
+
 def get_sar3(location, epiweek, valid):
   return SAR3(location).predict(epiweek, valid=valid)
 
@@ -460,6 +470,7 @@ def update(sensors, first_week=None, last_week=None, valid=False, test_mode=Fals
             'epic': get_epic,
             'sar3': get_sar3,
             'arch': get_arch,
+            'quid': get_quid,
           }[name](location, train_week, valid)
           print(' %4s %5s %d -> %.3f' % (name, location, test_week, value))
           # upload
