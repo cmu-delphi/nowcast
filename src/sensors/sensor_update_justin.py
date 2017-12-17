@@ -472,7 +472,6 @@ def update(sensors, first_week=None, last_week=None, valid=False, test_mode=Fals
       # timing
       ew1, ew2 = first_week, last_week
       if ew1 is None:
-        print(cur, name, location, sep=" ")
         ew1 = get_last_update(cur, name, location)
       if ew2 is None:
         ew2 = flu.add_epiweeks(last_issue, +1)
@@ -532,4 +531,5 @@ if __name__ == '__main__':
   sensors = [pair.split('-') for pair in args.names.split(',')]
 
   # update the requested sensors
+  print(sensors, first, last, args.valid, args.test, sep=" ")
   update(sensors, first, last, args.valid, args.test)
