@@ -98,6 +98,7 @@ Locations vary by data source, but include all of:
 # standard library
 import argparse
 import sys
+import subprocess
 
 # third party
 import mysql.connector
