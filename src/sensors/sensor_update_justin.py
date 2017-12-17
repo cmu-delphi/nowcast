@@ -336,18 +336,18 @@ def get_ght(location, epiweek, valid):
 
 def get_ghtj(location, epiweek, valid):
   loc = 'US' if location == 'nat' else location
-  # def justinfun(location, epiweek):
-  #   main_driver = 'ghtj.R'   ### Need to set an absolute path
-  #   subprocess.check_call(['Rscript', main_driver, location, epiweek], shell=False)
-  #   outputdir = '/home/justin/repos/ghtModel/output/' ### Need to set an absolute path
-  #   prefix = 'ghtpred-'
-  #   predfilename = outputdir + prefix + '-'+ location +'-' + epiweek + '.txt'
-  #   file = open(outputdir+prefix+epiweek+'.txt', 'r')
-  #   mypred = file.read()
-  #   return mypred
+  def justinfun(location, epiweek):
+    main_driver = 'ghtj.R'   ### Need to set an absolute path
+    subprocess.check_call(['Rscript', main_driver, location, epiweek], shell=False)
+    outputdir = '/home/justin/repos/ghtModel/output/' ### Need to set an absolute path
+    prefix = 'ghtpred-'
+    predfilename = outputdir + prefix + '-'+ location +'-' + epiweek + '.txt'
+    file = open(outputdir+prefix+epiweek+'.txt', 'r')
+    mypred = file.read()
+    return mypred
 
-  # # Making the single prediction now:
-  # mypred = justinfun(location, epiweek)
+  # Making the single prediction now:
+  mypred = justinfun(location, epiweek)
   mypred = 1
   return mypred
 
@@ -469,6 +469,7 @@ def update(sensors, first_week=None, last_week=None, valid=False, test_mode=Fals
     else:
       locations = [loc]
     # update each location
+    print(locations)
     for location in locations:
       # timing
       ew1, ew2 = first_week, last_week
