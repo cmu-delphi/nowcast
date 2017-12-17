@@ -338,9 +338,10 @@ def get_ght(location, epiweek, valid):
 def get_ghtj(location, epiweek, valid):
   loc = 'US' if location == 'nat' else location
   def justinfun(location, epiweek):
-    main_driver = 'ghtj.R'   ### Need to set an absolute path
+    main_driver = '/home/automation/ghtj/ghtj.R'   ### Need to set an absolute path
+    print("here")
     subprocess.check_call(['Rscript', main_driver, location, epiweek], shell=False)
-    outputdir = '/home/justin/repos/ghtModel/output/' ### Need to set an absolute path
+    outputdir = '/home/automation/ghtj' ### Need to set an absolute path
     prefix = 'ghtpred-'
     predfilename = outputdir + prefix + '-'+ location +'-' + epiweek + '.txt'
     file = open(outputdir+prefix+epiweek+'.txt', 'r')
@@ -349,7 +350,6 @@ def get_ghtj(location, epiweek, valid):
 
   # Making the single prediction now:
   mypred = justinfun(location, epiweek)
-  mypred = 1
   return mypred
 
 
