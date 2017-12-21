@@ -339,6 +339,7 @@ def get_ghtj(location, epiweek, valid):
   loc = 'US' if location == 'nat' else location
   def justinfun(location, epiweek):
     main_driver = '/home/automation/ghtj/ghtj.R'   ### Need to set an absolute path
+    print('here0')
     subprocess.check_call(['Rscript', main_driver, location, epiweek], shell=False)
     outputdir = '/home/automation/ghtj/' ### Need to set an absolute path
     prefix = 'ghtpred'
@@ -500,7 +501,6 @@ def update(sensors, first_week=None, last_week=None, valid=False, test_mode=Fals
           # upload
           store_value(cur, name, location, test_week, value)
         except Exception as ex:
-          print('here1!!')
           print(' failed: %4s %5s %d' % (name, location, test_week), ex)
           #raise ex
         sys.stdout.flush()
