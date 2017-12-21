@@ -152,7 +152,6 @@ def store_value(cur, name, location, epiweek, value):
     ON DUPLICATE KEY UPDATE
       `value` = %s
   '''
-  print('here')
   args = (name, location, epiweek, value, value)
   cur.execute(sql, args)
 
@@ -341,7 +340,6 @@ def get_ghtj(location, epiweek, valid):
   def justinfun(location, epiweek):
     main_driver = '/home/automation/ghtj/ghtj.R'   ### Need to set an absolute path
     subprocess.check_call(['Rscript', main_driver, location, epiweek], shell=False)
-    print('here')
     outputdir = '/home/automation/ghtj' ### Need to set an absolute path
     prefix = 'ghtpred-'
     predfilename = outputdir + prefix + '-'+ location +'-' + epiweek + '.txt'
@@ -498,6 +496,7 @@ def update(sensors, first_week=None, last_week=None, valid=False, test_mode=Fals
           }[name](location, train_week, valid)
           print(' %4s %5s %d -> %.3f' % (name, location, test_week, value))
           # upload
+          print('here!!')
           store_value(cur, name, location, test_week, value)
         except Exception as ex:
           print(' failed: %4s %5s %d' % (name, location, test_week), ex)
