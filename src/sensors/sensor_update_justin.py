@@ -534,6 +534,9 @@ if __name__ == '__main__':
   # extract name-location pairs
   sensors = [pair.split('-') for pair in args.names.split(',')]
 
+  print(first)
+  print(last)
+
   # update the requested sensors
   print(sensors, first, last, args.valid, args.test, sep=" ")
   update(sensors, first, last, args.valid, args.test)
