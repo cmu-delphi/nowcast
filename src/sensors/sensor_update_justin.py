@@ -481,7 +481,7 @@ def update(sensors, first_week=None, last_week=None, valid=False, test_mode=Fals
       print('Updating %s-%s from %d to %d.' % (name, location, ew1, ew2))
       for test_week in flu.range_epiweeks(ew1, ew2, inclusive=True):
         train_week = flu.add_epiweeks(test_week, -1)
-          print('here!!')
+        print('here!!')
         try:
           print('here!!')
           value = {
