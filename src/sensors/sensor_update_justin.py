@@ -348,7 +348,7 @@ def get_ghtj(location, epiweek, valid):
     print('here2')
     outputdir = '/home/automation/ghtj/' ### Need to set an absolute path
     prefix = 'ghtpred-'
-    predfilename = outputdir + prefix + '-'+ location +'-' + epiweek + '.txt'
+    predfilename = outputdir + prefix + '-'+ location +'-' + str(epiweek) + '.txt'
     print(predfilename)
     file = open(outputdir+prefix+epiweek+'.txt', 'r')
     mypred = file.read()
