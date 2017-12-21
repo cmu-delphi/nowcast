@@ -339,6 +339,7 @@ def get_ghtj(location, epiweek, valid):
   loc = 'US' if location == 'nat' else location
   def justinfun(location, epiweek):
     main_driver = '/home/automation/ghtj/ghtj.R'   ### Need to set an absolute path
+    main_driver = '/home/automation/ghtj/ghtj2.R'   ### Need to set an absolute path
     print('here1')
     print(location)
     print(epiweek)
