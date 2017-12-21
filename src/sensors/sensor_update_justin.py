@@ -339,18 +339,13 @@ def get_ghtj(location, epiweek, valid):
   loc = 'US' if location == 'nat' else location
   def justinfun(location, epiweek):
     main_driver = '/home/automation/ghtj/ghtj.R'   ### Need to set an absolute path
-    main_driver = '/home/automation/ghtj/ghtj2.R'   ### Need to set an absolute path
-    print('here1')
-    print(location)
-    print(epiweek)
-    # subprocess.check_call(['Rscript', main_driver, location, epiweek], shell=False)
-    subprocess.check_call(['Rscript', main_driver], shell=False)
-    print('here2')
+    subprocess.check_call(['Rscript', main_driver, location, epiweek], shell=False)
     outputdir = '/home/automation/ghtj/' ### Need to set an absolute path
     prefix = 'ghtpred'
     predfilename = outputdir + prefix + '-'+ location +'-' + str(epiweek) + '.txt'
     print(predfilename)
-    file = open(outputdir+prefix+str(epiweek)+'.txt', 'r')
+    # file = open(outputdir + prefix + str(epiweek) + '.txt', 'r')
+    file = open(predfilename, 'r')
     mypred = file.read()
     file.close()
     return mypred
