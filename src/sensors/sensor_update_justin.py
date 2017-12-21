@@ -340,6 +340,8 @@ def get_ghtj(location, epiweek, valid):
   def justinfun(location, epiweek):
     main_driver = '/home/automation/ghtj/ghtj.R'   ### Need to set an absolute path
     print('here1')
+    print(location)
+    print(epiweek)
     subprocess.check_call(['Rscript', main_driver, location, epiweek], shell=False)
     print('here2')
     outputdir = '/home/automation/ghtj' ### Need to set an absolute path
