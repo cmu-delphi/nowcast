@@ -346,6 +346,7 @@ def get_ghtj(location, epiweek, valid):
     predfilename = outputdir + prefix + '-'+ location +'-' + epiweek + '.txt'
     file = open(outputdir+prefix+epiweek+'.txt', 'r')
     mypred = file.read()
+    file.close()
     return mypred
 
   # Making the single prediction now:
