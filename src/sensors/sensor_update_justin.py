@@ -481,7 +481,9 @@ def update(sensors, first_week=None, last_week=None, valid=False, test_mode=Fals
       print('Updating %s-%s from %d to %d.' % (name, location, ew1, ew2))
       for test_week in flu.range_epiweeks(ew1, ew2, inclusive=True):
         train_week = flu.add_epiweeks(test_week, -1)
+          print('here!!')
         try:
+          print('here!!')
           value = {
             'gft': get_gft,
             'ght': get_ght,
@@ -494,11 +496,13 @@ def update(sensors, first_week=None, last_week=None, valid=False, test_mode=Fals
             'arch': get_arch,
             'quid': get_quid,
           }[name](location, train_week, valid)
+          print('here!!')
           print(' %4s %5s %d -> %.3f' % (name, location, test_week, value))
           # upload
           print('here!!')
           store_value(cur, name, location, test_week, value)
         except Exception as ex:
+          print('here1!!')
           print(' failed: %4s %5s %d' % (name, location, test_week), ex)
           #raise ex
         sys.stdout.flush()
