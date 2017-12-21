@@ -152,6 +152,7 @@ def store_value(cur, name, location, epiweek, value):
     ON DUPLICATE KEY UPDATE
       `value` = %s
   '''
+  print('here')
   args = (name, location, epiweek, value, value)
   cur.execute(sql, args)
 
@@ -481,9 +482,7 @@ def update(sensors, first_week=None, last_week=None, valid=False, test_mode=Fals
         ew2 = flu.add_epiweeks(last_issue, +1)
       print('Updating %s-%s from %d to %d.' % (name, location, ew1, ew2))
       for test_week in flu.range_epiweeks(ew1, ew2, inclusive=True):
-        print("here")
         train_week = flu.add_epiweeks(test_week, -1)
-        print("there")
         try:
           value = {
             'gft': get_gft,
