@@ -536,6 +536,8 @@ if __name__ == '__main__':
 
   print(first)
   print(last)
+  first = str(first)
+  last = str(last)
 
   # update the requested sensors
   print(sensors, first, last, args.valid, args.test, sep=" ")
