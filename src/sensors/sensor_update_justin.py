@@ -346,9 +346,10 @@ def get_ghtj(location, epiweek, valid):
     # subprocess.check_call(['Rscript', main_driver, location, epiweek], shell=False)
     subprocess.check_call(['Rscript', main_driver], shell=False)
     print('here2')
-    outputdir = '/home/automation/ghtj' ### Need to set an absolute path
+    outputdir = '/home/automation/ghtj/' ### Need to set an absolute path
     prefix = 'ghtpred-'
     predfilename = outputdir + prefix + '-'+ location +'-' + epiweek + '.txt'
+    print(predfilename)
     file = open(outputdir+prefix+epiweek+'.txt', 'r')
     mypred = file.read()
     file.close()
