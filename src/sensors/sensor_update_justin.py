@@ -480,6 +480,7 @@ def update(sensors, first_week=None, last_week=None, valid=False, test_mode=Fals
       if ew2 is None:
         ew2 = flu.add_epiweeks(last_issue, +1)
       print('Updating %s-%s from %d to %d.' % (name, location, ew1, ew2))
+      ew1 = str(ew1)
       for test_week in flu.range_epiweeks(ew1, ew2, inclusive=True):
         train_week = flu.add_epiweeks(test_week, -1)
         try:
@@ -536,8 +537,6 @@ if __name__ == '__main__':
 
   print(first)
   print(last)
-  first = str(first)
-  last = str(last)
 
   # update the requested sensors
   print(sensors, first, last, args.valid, args.test, sep=" ")
