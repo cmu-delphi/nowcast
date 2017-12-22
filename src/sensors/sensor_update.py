@@ -61,6 +61,7 @@ Locations vary by data source, but include all of:
 =================
 === Changelog ===
 =================
+
 2017-12-15
   + add `quid` data source
 2017-01-31
@@ -241,33 +242,16 @@ def get_training_set_data(data):
   return (epiweeks, X, Y)
 
 
-def get_training_set_ili(location, epiweek, signal, valid):
-  #if valid:
-  #  raise Exception('state ili is stable')
+def get_training_set(location, epiweek, signal, valid):
   ew1, ew2, ew3, weeks0, weeks1 = get_weeks(epiweek)
-  rows = Epidata.check(Epidata.stateili(secrets.api.stateili, location, weeks0))
-  stable = extract(rows, ['ili'])
-  data = {}
-  for ew in signal.keys():
-    if ew == ew3:
-      continue
-    if ew not in stable:
-      #raise Exception('missing state ili on %d' % ew)
-      continue
-    sig = signal[ew]
-    ili = stable[ew]
-    data[ew] = {'x': sig, 'y': ili}
-  return get_training_set_data(data)
-
-
-def get_training_set_wili(location, epiweek, signal, valid):
-  ew1, ew2, ew3, weeks0, weeks1 = get_weeks(epiweek)
+  auth = secrets.api.fluview
   try:
-    rows = Epidata.check(Epidata.fluview(location, weeks0, issues=ew2))
+    result = Epidata.fluview(location, weeks0, issues=ew2, auth=auth)
+    rows = Epidata.check(result)
     unstable = extract(rows, ['wili'])
   except:
     unstable = {}
-  rows = Epidata.check(Epidata.fluview(location, weeks0))
+  rows = Epidata.check(Epidata.fluview(location, weeks0, auth=auth))
   stable = extract(rows, ['wili'])
   data = {}
   for ew in signal.keys():
@@ -284,15 +268,6 @@ def get_training_set_wili(location, epiweek, signal, valid):
       wili = unstable[ew]
     data[ew] = {'x': sig, 'y': wili}
   return get_training_set_data(data)
-
-
-def get_training_set(location, epiweek, signal, valid):
-  if len(location) == 2:
-    # state
-    return get_training_set_ili(location, epiweek, signal, valid)
-  else:
-    # national or regional
-    return get_training_set_wili(location, epiweek, signal, valid)
 
 
 def get_prediction(location, epiweek, name, fields, fetch, valid):

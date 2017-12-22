@@ -20,13 +20,6 @@
       "dst": "[[package]]/sensors/",
       "match": "^(.+)(\\.py)$",
       "add-header-comment": true
-    },
-    {
-      "type": "move",
-      "src": "src/truth/",
-      "dst": "[[package]]/truth/",
-      "match": "^(.+)(\\.py)$",
-      "add-header-comment": true
     }
 
   ]

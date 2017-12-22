@@ -6,7 +6,6 @@
 As of 2017-11-08, this file is no longer used. It has been entirely replaced by
 sensor_update.py.
 
-
 ===============
 === Purpose ===
 ===============

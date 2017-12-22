@@ -51,6 +51,7 @@ std: nowcast standard deviation
 =================
 === Changelog ===
 =================
+
 2017-12-15
   + option to run nowcast with quidel
 2016-12-13
@@ -165,35 +166,30 @@ def nowcast(epiweek, epidata_cache=None):
   num_sensors = len(all_sensors)
   # get historical ground truth for each sensor (4 sec)
   truth = {}
+  auth = secrets.api.fluview
   for loc in sensor_locs:
     truth[loc] = {}
-    if loc in si.sta:
-      if epidata_cache is not None:
-        rows = epidata_cache.stateili(loc, past_weeks)
-      else:
-        rows = Epidata.check(Epidata.stateili(secrets.api.stateili, loc, past_weeks))
-      field = 'ili'
+    if epidata_cache is not None:
+      srows = epidata_cache.fluview(loc, past_weeks)
     else:
-      if epidata_cache is not None:
-        srows = epidata_cache.fluview(loc, past_weeks)
+      srows = Epidata.check(Epidata.fluview(loc, past_weeks, auth=auth))
+    sdata = dict([(r['epiweek'], r) for r in srows])
+    udata = {}
+    try:
+      i = past_weeks['to']
+      result = Epidata.fluview(loc, past_weeks, issues=i, auth=auth)
+      urows = Epidata.check(result)
+      udata = dict([(r['epiweek'], r) for r in urows])
+    except:
+      pass
+    rows = []
+    for ew in all_epiweeks:
+      if ew in udata:
+        rows.append(udata[ew])
       else:
-        srows = Epidata.check(Epidata.fluview(loc, past_weeks))
-      sdata = dict([(r['epiweek'], r) for r in srows])
-      udata = {}
-      try:
-        urows = Epidata.check(Epidata.fluview(loc, past_weeks, issues=past_weeks['to']))
-        udata = dict([(r['epiweek'], r) for r in urows])
-      except:
-        pass
-      rows = []
-      for ew in all_epiweeks:
-        if ew in udata:
-          rows.append(udata[ew])
-        else:
-          rows.append(sdata[ew])
-      field = 'wili'
+        rows.append(sdata[ew])
     for row in rows:
-      truth[loc][row['epiweek']] = row[field]
+      truth[loc][row['epiweek']] = row['wili']
   # rows are epiweeks, cols are sensors
   X = np.zeros((num_obs, num_sensors)) * np.nan
   for (r, ew) in enumerate(all_epiweeks):
@@ -295,9 +291,8 @@ class Cache:
     si = StateInfo()
     all_names, all_loc = get_all_sensors()
     self._sensors = {}
-    self._stateili = {}
     self._fluview = {}
-    na, nb, nc = 0, 0, 0
+    na, nc = 0, 0
     for loc in all_loc:
       for name in all_names:
         res = Epidata.sensors(secrets.api.sensors, name, loc, weeks)
@@ -310,37 +305,20 @@ class Cache:
               self._sensors[n][l] = []
             self._sensors[n][l].append(row)
             na += 1
-      if loc in si.sta:
-        res = Epidata.stateili(secrets.api.stateili, loc, weeks)
-        if res['result'] == 1:
-          for row in res['epidata']:
-            l = row['state']
-            if l not in self._stateili:
-              self._stateili[l] = []
-            self._stateili[l].append(row)
-            nb += 1
-      else:
-        res = Epidata.fluview(loc, weeks)
-        if res['result'] == 1:
-          for row in res['epidata']:
-            l = row['region']
-            if l not in self._fluview:
-              self._fluview[l] = []
-            self._fluview[l].append(row)
-            nc += 1
-    print('done (%d|%d|%d)' % (na, nb, nc))
+      res = Epidata.fluview(loc, weeks, auth=secrets.api.fluview)
+      if res['result'] == 1:
+        for row in res['epidata']:
+          l = row['region']
+          if l not in self._fluview:
+            self._fluview[l] = []
+          self._fluview[l].append(row)
+          nc += 1
+    print('done (%d|%d)' % (na, nc))
 
   def sensors(self, name, loc, past_weeks):
     ew1, ew2 = past_weeks['from'], past_weeks['to']
     if name in self._sensors and loc in self._sensors[name]:
       return [r for r in self._sensors[name][loc] if ew1 <= r['epiweek'] <= ew2]
-    else:
-      return []
-
-  def stateili(self, loc, past_weeks):
-    ew1, ew2 = past_weeks['from'], past_weeks['to']
-    if loc in self._stateili:
-      return [r for r in self._stateili[loc] if ew1 <= r['epiweek'] <= ew2]
     else:
       return []
 

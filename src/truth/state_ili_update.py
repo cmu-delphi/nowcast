@@ -1,4 +1,12 @@
 """
+==================
+=== Deprecated ===
+==================
+
+As of 2017-12-21, this file is no longer used. State ILI is imputed by
+impute_missing_values.py in the delphi-epidata repository.
+
+
 ===============
 === Purpose ===
 ===============
