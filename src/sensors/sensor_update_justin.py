@@ -311,11 +311,11 @@ def get_ght(location, epiweek, valid):
 
 
 def get_ghtj(location, epiweek, valid):
-  loc = 'US' if location == 'nat' else location
+  # loc = 'US' if location == 'nat' else location
   def justinfun(location, epiweek):
     main_driver = '/home/automation/ghtj/ghtj.R'   ### Need to set an absolute path
     subprocess.check_call(['Rscript', main_driver, location, str(epiweek)], shell=False)
-    outputdir = '/home/automation/ghtj/' ### Need to set an absolute path
+    outputdir = '/home/automation/ghtj/output' ### Need to set an absolute path
     prefix = 'ghtpred'
     predfilename = outputdir + prefix + '-'+ location +'-' + str(epiweek) + '.txt'
     print(predfilename)
