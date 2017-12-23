@@ -322,6 +322,9 @@ def get_ghtj(location, epiweek, valid):
     # file = open(outputdir + prefix + str(epiweek) + '.txt', 'r')
     file = open(predfilename, 'r')
     mypred = file.read()
+    print(mypred)
+    mypred = float(mypred)
+    print(mypred)
     file.close()
     return mypred
 
