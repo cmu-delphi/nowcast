@@ -318,11 +318,9 @@ def get_ghtj(location, epiweek, valid):
     outputdir = '/home/automation/ghtj/output' ### Need to set an absolute path
     prefix = 'ghtpred'
     predfilename = outputdir + '/' + prefix + '-'+ loc +'-' + str(epiweek) + '.txt'
-    print(predfilename)
     # file = open(outputdir + prefix + str(epiweek) + '.txt', 'r')
     file = open(predfilename, 'r')
     mypred = file.read()
-    print(mypred)
     mypred = float(mypred)
     print(mypred)
     file.close()
@@ -512,9 +510,6 @@ if __name__ == '__main__':
 
   # extract name-location pairs
   sensors = [pair.split('-') for pair in args.names.split(',')]
-
-  print(first)
-  print(last)
 
   # update the requested sensors
   print(sensors, first, last, args.valid, args.test, sep=" ")
