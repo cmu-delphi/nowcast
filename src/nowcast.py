@@ -94,6 +94,10 @@ import delphi.utils.epiweek as flu
 from delphi.utils.state_info import StateInfo
 
 
+# the first epiweek for which we have ground truth ILI in all locations
+FIRST_DATA_EPIWEEK = 201040
+
+
 def get_most_recent_issue():
   # search for FluView issues within the last 10 weeks
   ew2 = EpiDate.today().get_ew()
@@ -127,7 +131,7 @@ def nowcast(epiweek, epidata_cache=None):
   past = {}
   sensor_locs = set()
   missing = set()
-  past_weeks = Epidata.range(200950, flu.add_epiweeks(epiweek, -1))
+  past_weeks = Epidata.range(FIRST_DATA_EPIWEEK, flu.add_epiweeks(epiweek, -1))
   all_epiweeks = [w for w in flu.range_epiweeks(past_weeks['from'], past_weeks['to'], inclusive=True)]
   num_obs = len(all_epiweeks)
   for name in present.keys():
@@ -285,7 +289,7 @@ def update(ew1, ew2, test_mode=False, epidata_cache=None):
 class Cache:
 
   def __init__(self, ew2):
-    ew1 = 200950
+    ew1 = FIRST_DATA_EPIWEEK
     print('prefetching %d--%d...' % (ew1, ew2))
     weeks = Epidata.range(ew1, ew2)
     si = StateInfo()
