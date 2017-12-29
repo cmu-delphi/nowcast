@@ -98,6 +98,7 @@ Locations vary by data source, but include all of:
 
 # standard library
 import argparse
+import subprocess
 import sys
 
 # third party
@@ -309,6 +310,27 @@ def get_ght(location, epiweek, valid):
   return get_prediction(location, epiweek, 'ght', 'value', fetch, valid)
 
 
+def get_ghtj(location, epiweek, valid):
+  loc = 'US' if location == 'nat' else location
+  def justinfun(location, epiweek):
+    main_driver = '/home/automation/ghtj/ghtj.R'   ### Need to set an absolute path
+    subprocess.check_call(['Rscript', main_driver, location, str(epiweek)], shell=False)
+    outputdir = '/home/automation/ghtj/output' ### Need to set an absolute path
+    prefix = 'ghtpred'
+    predfilename = outputdir + '/' + prefix + '-'+ loc +'-' + str(epiweek) + '.txt'
+    # file = open(outputdir + prefix + str(epiweek) + '.txt', 'r')
+    file = open(predfilename, 'r')
+    mypred = file.read()
+    mypred = float(mypred)
+    print(mypred)
+    file.close()
+    return mypred
+
+  # Making the single prediction now:
+  mypred = justinfun(location, epiweek)
+  return mypred
+
+
 def get_twtr(location, epiweek, valid):
   def fetch(weeks):
     # Impute missing weeks with 0%
@@ -439,6 +461,7 @@ def update(sensors, first_week=None, last_week=None, valid=False, test_mode=Fals
           value = {
             'gft': get_gft,
             'ght': get_ght,
+            # 'ghtj': get_ght,
             'twtr': get_twtr,
             'wiki': get_wiki,
             'cdc': get_cdc,
