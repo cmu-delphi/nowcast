@@ -461,7 +461,7 @@ def update(sensors, first_week=None, last_week=None, valid=False, test_mode=Fals
           value = {
             'gft': get_gft,
             'ght': get_ght,
-            # 'ghtj': get_ght,
+            # 'ghtj': get_ghtj,
             'twtr': get_twtr,
             'wiki': get_wiki,
             'cdc': get_cdc,
