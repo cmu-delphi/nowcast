@@ -255,6 +255,7 @@ def get_training_set(location, epiweek, signal, valid):
   rows = Epidata.check(Epidata.fluview(location, weeks0, auth=auth))
   stable = extract(rows, ['wili'])
   data = {}
+  num_dropped = 0
   for ew in signal.keys():
     if ew == ew3:
       continue
@@ -263,11 +264,15 @@ def get_training_set(location, epiweek, signal, valid):
       if valid and flu.delta_epiweeks(ew, ew3) <= 5:
         raise Exception('unstable wILI is not available on %d' % ew)
       if ew not in stable:
-        raise Exception('wILI (any) is not available on %d' % ew)
+        num_dropped += 1
+        continue
       wili = stable[ew]
     else:
       wili = unstable[ew]
     data[ew] = {'x': sig, 'y': wili}
+  if num_dropped:
+    msg = 'warning: dropped %d/%d signal weeks because (w)ILI was unavailable'
+    print(msg % (num_dropped, len(signal)))
   return get_training_set_data(data)
 
 
