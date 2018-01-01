@@ -312,10 +312,14 @@ class Cache:
       res = Epidata.fluview(loc, weeks, auth=secrets.api.fluview)
       if res['result'] == 1:
         for row in res['epidata']:
-          l = row['region']
-          if l not in self._fluview:
-            self._fluview[l] = []
-          self._fluview[l].append(row)
+          # Make sure that the case of the returned location is consistent with
+          # the case used elsewhere; lower for regions and upper for states.
+          if row['region'].lower() != loc.lower():
+            raise Exception(row['region'], loc)
+          row['region'] = loc
+          if loc not in self._fluview:
+            self._fluview[loc] = []
+          self._fluview[loc].append(row)
           nc += 1
     print('done (%d|%d)' % (na, nc))
 
