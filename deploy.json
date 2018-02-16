@@ -16,11 +16,21 @@
     },
     {
       "type": "move",
+      "src": "src/fusion/",
+      "dst": "[[package]]/fusion/",
+      "match": "^(.+)(\\.py)$",
+      "add-header-comment": true
+    },
+    {
+      "type": "move",
       "src": "src/sensors/",
       "dst": "[[package]]/sensors/",
       "match": "^(.+)(\\.py)$",
       "add-header-comment": true
-    }
+    },
+
+    "// run unit and coverage tests",
+    {"type": "py3test"}
 
   ]
 }

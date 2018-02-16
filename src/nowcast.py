@@ -86,7 +86,7 @@ import mysql.connector
 import numpy as np
 
 # first party
-from .fusion import Fusion
+from delphi.nowcast.fusion0 import Fusion
 from delphi.epidata.client.delphi_epidata import Epidata
 import delphi.operations.secrets as secrets
 from delphi.utils.epidate import EpiDate
