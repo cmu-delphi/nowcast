@@ -46,7 +46,10 @@ class UsFusion:
     atom_populations = []
     for atom in atoms:
       if atom in Locations.region_map[location]:
-        population = get_population(atom, season)
+        if season:
+          population = get_population(atom, season)
+        else:
+          population = get_population(atom)
       else:
         population = 0
       total_population += population
@@ -74,10 +77,9 @@ class UsFusion:
   @staticmethod
   @functools.lru_cache(maxsize=16)
   def determine_statespace(
-    input_locations,
-    season=None,
-    exclude_locations=()
-  ):
+      input_locations,
+      season=None,
+      exclude_locations=()):
     """
     Return matrices mapping from latent statespace to input space and output
     space. These are the matrices H and W, respectively, used in the sensor
