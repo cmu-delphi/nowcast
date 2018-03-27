@@ -12,6 +12,7 @@ import abc
 
 # third party
 import numpy as np
+import scipy.linalg
 import scipy.stats
 
 # first party
@@ -57,10 +58,17 @@ def is_posdef(X):
   """
 
   # Attempting the Cholesky decomposition is ostensibly faster than checking
-  # the sign of the minimum eigenvalue, even given the overhead of exception
-  # handling.
+  # the magnitude of the smallest eigenvalue, even given the overhead of
+  # exception handling.
   try:
-    return np.linalg.cholesky(X) is not None
+    # Scipy is used here instead of numpy because each gives a different result
+    # for certain edge cases. Since the result of this function guards a
+    # subsequent call to scipy (namely, logpdf), the scipy version is used for
+    # consistency. Otherwise, the numpy version may indicate that the matrix is
+    # positive definite, only to then have scipy fail to compute the logpdf.
+    # Both implementations raise the same error type (namely, numpy's
+    # LinAlgError) if the matrix isn't positive definite.
+    return scipy.linalg.cholesky(X) is not None
   except np.linalg.linalg.LinAlgError:
     return False
 
