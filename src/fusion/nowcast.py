@@ -149,6 +149,10 @@ class Nowcast:
     train_weeks = self.data_source.get_weeks()
     num_inputs = len(sensors) * len(locations)
 
+    # exclude training weeks that are later than all testing weeks
+    last_test_week = max(test_weeks)
+    train_weeks = [week for week in train_weeks if week < last_test_week]
+
     # create empty (np.nan) matrices for sensor noise and readings
     sensor_noise = np.full((len(train_weeks), num_inputs), np.nan)
     sensor_readings = np.full((len(test_weeks), num_inputs), np.nan)
@@ -209,7 +213,7 @@ class Nowcast:
     """
 
     # select training data in the past relative to this week
-    train_weeks = self.data_source.get_weeks()
+    train_weeks = self.data_source.get_weeks()[:sensor_noise.shape[0]]
     past_weeks = np.array(train_weeks) < week
     noise = sensor_noise[past_weeks, :]
 
