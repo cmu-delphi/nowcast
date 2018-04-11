@@ -45,7 +45,11 @@ class FluDataSource(DataSource):
     for loc in all_locations:
       if self.get_truth_value(epiweek, loc) is not None:
         available_locations.append(loc)
-    return tuple(set(all_locations) - set(available_locations))
+    if available_locations:
+      return tuple(set(all_locations) - set(available_locations))
+    else:
+      # no data is available, assume that all locations will be reporting
+      return ()
 
   @functools.lru_cache(maxsize=1)
   def get_sensors(self):

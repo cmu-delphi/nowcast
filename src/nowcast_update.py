@@ -71,8 +71,6 @@ class NowcastUpdate:
       # save each nowcast
       for week, nowcast in zip(weeks, nowcasts):
         for location, value, stdev in nowcast:
-          if location == 'nat':
-            print(week, location, value, stdev)
           db.insert(week, location, float(value), float(stdev))
 
       # update the timestamp

@@ -283,5 +283,10 @@ class Nowcast:
           exclude_locations=exclude_locations)
       weekly_nowcasts.append(nowcast)
 
+      # show progress
+      row = nowcast[0]
+      args = (week, row[0], row[1], row[2])
+      print('[%d] %s: %.3f (%.3f)' % args)
+
     # return the list of nowcasts
     return weekly_nowcasts

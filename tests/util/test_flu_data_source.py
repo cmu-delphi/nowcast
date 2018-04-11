@@ -146,3 +146,25 @@ class UnitTests(unittest.TestCase):
 
     self.assertEqual(epidata.fluview.call_count, 1)
     self.assertEqual(epidata.sensors.call_count, 1)
+
+  def test_missing_locations_all_reporting(self):
+    """Expect no missing locations when all locations are reporting."""
+    data_source = FluDataSource(None, None)
+    data_source.get_truth_value = lambda *a: 1
+    missing = data_source.get_missing_locations(None)
+    self.assertEqual(missing, ())
+
+  def test_missing_locations_some_reporting(self):
+    """Expect some missing locations when some locations are reporting."""
+    data_source = FluDataSource(None, None)
+    data_source.get_truth_value = lambda e, l: {'nat': 1}.get(l, None)
+    missing = data_source.get_missing_locations(None)
+    self.assertTrue(len(missing) > 0)
+    self.assertNotIn('nat', missing)
+
+  def test_missing_locations_none_reporting(self):
+    """Expect no missing locations when no locations are reporting."""
+    data_source = FluDataSource(None, None)
+    data_source.get_truth_value = lambda *a: None
+    missing = data_source.get_missing_locations(None)
+    self.assertEqual(missing, ())
