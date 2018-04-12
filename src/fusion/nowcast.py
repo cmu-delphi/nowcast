@@ -186,7 +186,8 @@ class Nowcast:
     # return column definitions and data
     return inputs, sensor_noise, sensor_readings
 
-  def get_sensor_data_for_week(self, inputs, sensor_noise, week, week_reading):
+  def get_sensor_data_for_week(
+      self, inputs, sensor_noise, week, week_reading, exclude_locations=()):
     """
     Return training data and sensor readings for the given week.
 
@@ -204,6 +205,9 @@ class Nowcast:
       sensor_noise: matrix of training data (sensor readings minus truth)
       week: the epiweek for which the nowcast will be made
       week_reading: the vector of sensor readings for this week
+      exclude_locations (optional): a tuple of atomic locations that should be
+        excluded from statespace (i.e. because num_providers is known to be
+        zero)
 
     output:
       a tuple consisting of:
@@ -225,6 +229,10 @@ class Nowcast:
     noise_columns = np.sum(noise_present, axis=0) >= self.min_observations
     reading_columns = np.isfinite(week_reading)
     keep_columns = np.logical_and(noise_columns, reading_columns)
+
+    # exclude columns corresponding to excluded locations
+    keep_locs = [loc not in exclude_locations for (name, loc) in inputs]
+    keep_columns = np.logical_and(keep_columns, keep_locs)
 
     # the list of locations corresponding to non-empty columns
     selected_inputs = list(itertools.compress(inputs, keep_columns))
@@ -265,12 +273,12 @@ class Nowcast:
     weekly_nowcasts = []
     for week, week_reading in zip(test_weeks, readings):
 
-      # get training and testing data "as of" the current week
-      week_inputs, week_noise, week_reading = self.get_sensor_data_for_week(
-          inputs, noise, week, week_reading)
-
       # possibly exclude non-reporting locations (retrospective nowcasts only)
       exclude_locations = self.data_source.get_missing_locations(week)
+
+      # get training and testing data "as of" the current week
+      week_inputs, week_noise, week_reading = self.get_sensor_data_for_week(
+          inputs, noise, week, week_reading, exclude_locations)
 
       # generate the nowcast in all possible locations for this week
       season = Nowcast.get_season(week)

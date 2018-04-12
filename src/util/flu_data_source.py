@@ -40,13 +40,19 @@ class FluDataSource(DataSource):
   @functools.lru_cache(maxsize=None)
   def get_missing_locations(self, epiweek):
     """Return a tuple of locations which did not report on the given week."""
-    all_locations = self.get_locations()
+
+    # only return missing atoms, i.e. locations that can't be further split
+    atomic_locations = set(self.get_locations()) & set(Locations.atom_list)
+
     available_locations = []
-    for loc in all_locations:
-      if self.get_truth_value(epiweek, loc) is not None:
-        available_locations.append(loc)
+    for loc in atomic_locations:
+      if self.get_truth_value(epiweek, loc) is None:
+        # this atomic location didn't report (or it's a future week)
+        continue
+      available_locations.append(loc)
+
     if available_locations:
-      return tuple(set(all_locations) - set(available_locations))
+      return tuple(atomic_locations - set(available_locations))
     else:
       # no data is available, assume that all locations will be reporting
       return ()

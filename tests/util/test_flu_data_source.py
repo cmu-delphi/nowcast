@@ -105,7 +105,7 @@ class UnitTests(unittest.TestCase):
 
     # expected values
     expected_locations = set(Locations.region_list)
-    expected_missing = set(Locations.region_list) - set(locations)
+    expected_missing = set(Locations.atom_list) - set(locations)
     expected_sensors = set(sensors)
     expected_weeks = set(
         range_epiweeks(
@@ -157,10 +157,10 @@ class UnitTests(unittest.TestCase):
   def test_missing_locations_some_reporting(self):
     """Expect some missing locations when some locations are reporting."""
     data_source = FluDataSource(None, None)
-    data_source.get_truth_value = lambda e, l: {'nat': 1}.get(l, None)
+    data_source.get_truth_value = lambda e, l: {'fl': 1}.get(l, None)
     missing = data_source.get_missing_locations(None)
     self.assertTrue(len(missing) > 0)
-    self.assertNotIn('nat', missing)
+    self.assertNotIn('fl', missing)
 
   def test_missing_locations_none_reporting(self):
     """Expect no missing locations when no locations are reporting."""

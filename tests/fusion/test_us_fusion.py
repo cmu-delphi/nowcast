@@ -78,12 +78,12 @@ class UnitTests(unittest.TestCase):
     # directly exclude an input location
     with self.assertRaises(Exception):
       inputs = tuple(Locations.atom_list)
-      excludes = ['ar']
+      excludes = ('ar',)
       UsFusion.determine_statespace(inputs, exclude_locations=excludes)
 
     # indirectly exclude an input location
     with self.assertRaises(Exception):
-      excludes = Locations.region_map['hhs2']
+      excludes = tuple(Locations.region_map['hhs2'])
       UsFusion.determine_statespace(('hhs2',), exclude_locations=excludes)
 
     # some locations aren't available for all seasons
