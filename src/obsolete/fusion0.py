@@ -1,4 +1,12 @@
 """
+==================
+=== Deprecated ===
+==================
+
+As of 2018-04-16, this file is no longer used. Sensor fusion and covariance
+estimation are implemented in fusion/fusion.py and fusion/covariance.py.
+
+
 ===============
 === Purpose ===
 ===============

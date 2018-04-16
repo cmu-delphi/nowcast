@@ -1,4 +1,12 @@
 """
+==================
+=== Deprecated ===
+==================
+
+As of 2018-04-16, this file is no longer used. Operational nowcasting is
+implemented in nowcast_update.py.
+
+
 ===============
 === Purpose ===
 ===============
