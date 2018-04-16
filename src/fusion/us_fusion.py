@@ -115,7 +115,7 @@ class UsFusion:
     # list of all locations, including nat, hhs, cen, and atoms
     all_locations = list(filter(atom_filter, Locations.region_list))
 
-    # list of atomic locatinos only
+    # list of atomic locations only
     atoms = list(filter(atom_filter, Locations.atom_list))
 
     # precursors of the H and W matrices, assuming that statespace is US atoms
