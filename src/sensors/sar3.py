@@ -42,6 +42,7 @@ import numpy as np
 
 # first party
 from delphi.epidata.client.delphi_epidata import Epidata
+import delphi.operations.secrets as secrets
 import delphi.utils.epiweek as EW
 
 
@@ -57,10 +58,11 @@ class SAR3:
   def __init__(self, region):
     self.region = region
     weeks = Epidata.range(200330, 202330)
-    r0 = Epidata.check(Epidata.fluview(self.region, weeks, lag=0))
-    r1 = Epidata.check(Epidata.fluview(self.region, weeks, lag=1))
-    r2 = Epidata.check(Epidata.fluview(self.region, weeks, lag=2))
-    rx = Epidata.check(Epidata.fluview(self.region, weeks))
+    auth = secrets.api.fluview
+    r0 = Epidata.check(Epidata.fluview(self.region, weeks, lag=0, auth=auth))
+    r1 = Epidata.check(Epidata.fluview(self.region, weeks, lag=1, auth=auth))
+    r2 = Epidata.check(Epidata.fluview(self.region, weeks, lag=2, auth=auth))
+    rx = Epidata.check(Epidata.fluview(self.region, weeks, auth=auth))
     self.data = {}
     self.valid = {}
     self.ew2i, self.i2ew = {}, {}
@@ -150,7 +152,7 @@ if __name__ == '__main__':
   print('Most recent issue: %d' % ew1)
   prediction = SAR3(reg).predict(ew1, True)
   print('Predicted wILI in %s on %d: %.3f' % (reg, ew2, prediction))
-  res = Epidata.fluview(reg, ew2)
+  res = Epidata.fluview(reg, ew2, auth=secrets.api.fluview)
   if res['result'] == 1:
     row = res['epidata'][0]
     issue = row['issue']
