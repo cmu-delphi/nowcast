@@ -281,7 +281,7 @@ def validate_args(args):
 
 def main(*args):
   """Run this script from the command line."""
-  NowcastExperiment.run_experiment(*args)
+  NowcastExperiment.new_instance().run_experiment(*args)
 
 
 if __name__ == '__main__':
