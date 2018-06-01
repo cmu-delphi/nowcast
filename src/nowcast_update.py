@@ -23,9 +23,6 @@ class NowcastUpdate:
   are stored in the Delphi database and are accessible via the Epidata API.
   """
 
-  # all known sensors, past and present
-  SENSORS = ['gft', 'ght', 'twtr', 'wiki', 'cdc', 'epic', 'sar3', 'arch']
-
   @staticmethod
   def new_instance(test_mode):
     """
@@ -33,7 +30,7 @@ class NowcastUpdate:
     true, database changes will not be committed.
     """
     database = NowcastDatabase.new_instance(test_mode)
-    data_source = FluDataSource(Epidata, NowcastUpdate.SENSORS)
+    data_source = FluDataSource.new_instance()
     return NowcastUpdate(database, data_source)
 
   def __init__(self, database, data_source):

@@ -26,16 +26,25 @@ class FluDataSource(DataSource):
   # the first epiweek for which we have ground truth ILI in all locations
   FIRST_DATA_EPIWEEK = 201040
 
-  def __init__(self, epidata, sensors):
+  # all known sensors, past and present
+  SENSORS = ['gft', 'ght', 'twtr', 'wiki', 'cdc', 'epic', 'sar3', 'arch']
+
+  @staticmethod
+  def new_instance():
+    return FluDataSource(
+        Epidata, FluDataSource.SENSORS, Locations.region_list)
+
+  def __init__(self, epidata, sensors, locations):
     self.epidata = epidata
     self.sensors = sensors
+    self.locations = locations
     # cache for prefetching bulk flu data
     self.cache = {}
 
   @functools.lru_cache(maxsize=1)
   def get_locations(self):
     """Return a list of possible locations."""
-    return Locations.region_list
+    return self.locations
 
   @functools.lru_cache(maxsize=None)
   def get_missing_locations(self, epiweek):

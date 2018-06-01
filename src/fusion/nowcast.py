@@ -266,6 +266,19 @@ class Nowcast:
       (location, (w)ILI, stdev) tuples.
     """
 
+    num_sensors = len(self.data_source.get_sensors())
+    num_locations = len(self.data_source.get_locations())
+    num_weeks = len(test_weeks)
+    week_range = (min(test_weeks), max(test_weeks))
+    cov_impl = self.shrinkage.__name__
+    print(
+        'nowcasting with %d sensors' % num_sensors,
+        'in %d locations' % num_locations,
+        'over %d weeks' % num_weeks,
+        'spanning %d--%d' % week_range,
+        'with algorithm %s' % cov_impl
+    )
+
     # collect all training and testing data up-front
     inputs, noise, readings = self.get_sensor_data_for_all_weeks(test_weeks)
 

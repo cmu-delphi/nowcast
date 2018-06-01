@@ -18,7 +18,7 @@ class UnitTests(unittest.TestCase):
   def test_get_most_recent_issue(self):
     epidata = MagicMock()
     epidata.check.return_value = [{'issue': i} for i in [201802, 201801]]
-    data_source = FluDataSource(epidata, None)
+    data_source = FluDataSource(epidata, None, None)
     issue = data_source.get_most_recent_issue()
     self.assertEqual(issue, 201802)
 
@@ -31,7 +31,8 @@ class UnitTests(unittest.TestCase):
       'wili': 1,
       'value': 2
     }]
-    data_source = FluDataSource(epidata, ['epic', 'sar3'])
+    data_source = FluDataSource(
+        epidata, ['epic', 'sar3'], Locations.region_list)
     data_source.get_locations = lambda *a: ['nat', 'vi']
 
     # populate the cache
@@ -100,7 +101,7 @@ class UnitTests(unittest.TestCase):
 
     # create data source
     epidata = MagicMock(fluview=get_fluview, sensors=get_sensors)
-    data_source = FluDataSource(epidata, sensors)
+    data_source = FluDataSource(epidata, sensors, Locations.region_list)
     data_source.get_most_recent_issue = lambda: epiweek
 
     # expected values
@@ -138,8 +139,7 @@ class UnitTests(unittest.TestCase):
     # setup
     epidata = MagicMock()
     epidata.fluview.return_value = {'result': -2}
-    data_source = FluDataSource(epidata, ['wiki'])
-    data_source.get_locations = lambda *a: ['nat']
+    data_source = FluDataSource(epidata, ['wiki'], ['nat'])
 
     # populate the cache
     data_source.prefetch(201453)
@@ -149,14 +149,14 @@ class UnitTests(unittest.TestCase):
 
   def test_missing_locations_all_reporting(self):
     """Expect no missing locations when all locations are reporting."""
-    data_source = FluDataSource(None, None)
+    data_source = FluDataSource(None, None, ['al', 'fl'])
     data_source.get_truth_value = lambda *a: 1
     missing = data_source.get_missing_locations(None)
     self.assertEqual(missing, ())
 
   def test_missing_locations_some_reporting(self):
     """Expect some missing locations when some locations are reporting."""
-    data_source = FluDataSource(None, None)
+    data_source = FluDataSource(None, None, ['al', 'fl'])
     data_source.get_truth_value = lambda e, l: {'fl': 1}.get(l, None)
     missing = data_source.get_missing_locations(None)
     self.assertTrue(len(missing) > 0)
@@ -164,7 +164,11 @@ class UnitTests(unittest.TestCase):
 
   def test_missing_locations_none_reporting(self):
     """Expect no missing locations when no locations are reporting."""
-    data_source = FluDataSource(None, None)
+    data_source = FluDataSource(None, None, ['al', 'fl'])
     data_source.get_truth_value = lambda *a: None
     missing = data_source.get_missing_locations(None)
     self.assertEqual(missing, ())
+
+  def test_new_instance(self):
+    """A new instance can be created with sensible defaults."""
+    self.assertIsInstance(FluDataSource.new_instance(), FluDataSource)
