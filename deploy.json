@@ -16,6 +16,13 @@
     },
     {
       "type": "move",
+      "src": "src/experiments/",
+      "dst": "[[package]]/experiments/",
+      "match": "^(.+)(\\.py)$",
+      "add-header-comment": true
+    },
+    {
+      "type": "move",
       "src": "src/fusion/",
       "dst": "[[package]]/fusion/",
       "match": "^(.+)(\\.py)$",
