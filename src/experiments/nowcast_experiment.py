@@ -64,7 +64,7 @@ class NowcastExperiment:
           shrinkage=cov_impl,
           min_observations=NowcastExperiment.MIN_OBSERVATIONS)
 
-    def call_with_file(filename, func):
+    def call_with_file(self, filename, func):
       """Run the given function with a file object."""
       with open(filename, 'w', newline='') as file_obj:
         func(file_obj)
@@ -236,7 +236,7 @@ class NowcastExperiment:
     # save the nowcasts
     print('saving nowcasts to %s' % filename)
     func = lambda file_obj: self.save_to_file(file_obj, weeks, nowcasts)
-    self.provider.call_with_file(func)
+    self.provider.call_with_file(filename, func)
 
 
 def get_argument_parser():

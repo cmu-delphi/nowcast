@@ -262,7 +262,7 @@ class UnitTests(unittest.TestCase):
 
     self.assertTrue(self.mock_provider.get_data_source.called)
     args, kwargs = self.mock_provider.get_data_source.call_args
-    self.assertTrue(len(args), 3)
+    self.assertEqual(len(args), 3)
     self.assertEqual(args[0], self.mock_epidata)
     self.assertIn('gft', args[1])
     self.assertIn('nv', args[2])
@@ -270,22 +270,23 @@ class UnitTests(unittest.TestCase):
 
     self.assertTrue(self.mock_provider.get_nowcast.called)
     args, kwargs = self.mock_provider.get_nowcast.call_args
-    self.assertTrue(len(args), 2)
+    self.assertEqual(len(args), 2)
     self.assertEqual(args[0], data_source)
     self.assertEqual(args[1], covariance.BlendDiagonal2)
     nowcaster = self.mock_provider.get_nowcast()
 
     self.assertTrue(self.mock_provider.call_with_file.called)
     args, kwargs = self.mock_provider.call_with_file.call_args
-    self.assertTrue(len(args), 1)
-    self.assertTrue(callable(args[0]))
+    self.assertEqual(len(args), 2)
+    self.assertIsInstance(args[0], str)
+    self.assertTrue(callable(args[1]))
 
     self.assertTrue(data_source.prefetch.called)
     args, kwargs = data_source.prefetch.call_args
-    self.assertTrue(len(args), 1)
+    self.assertEqual(len(args), 1)
     self.assertEqual(args[0], 3)
 
     self.assertTrue(nowcaster.batch_nowcast.called)
     args, kwargs = nowcaster.batch_nowcast.call_args
-    self.assertTrue(len(args), 1)
+    self.assertEqual(len(args), 1)
     self.assertEqual(args[0], [1, 2, 3])
