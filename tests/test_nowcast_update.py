@@ -53,7 +53,8 @@ class UnitTests(unittest.TestCase):
     connector = MagicMock()
     database = NowcastDatabase(connector, False)
     data_source = MagicMock(
-        get_locations=lambda *a: ['nat', 'vi'],
+        get_truth_locations=lambda *a: ['nat', 'vi'],
+        get_sensor_locations=lambda *a: ['nat', 'vi'],
         get_missing_locations=lambda *a: (),
         get_sensors=lambda *a: ['epic', 'sar3'],
         get_most_recent_issue=lambda *a: 201813,

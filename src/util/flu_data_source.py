@@ -37,21 +37,26 @@ class FluDataSource(DataSource):
   def __init__(self, epidata, sensors, locations):
     self.epidata = epidata
     self.sensors = sensors
-    self.locations = locations
+    self.sensor_locations = locations
     # cache for prefetching bulk flu data
     self.cache = {}
 
   @functools.lru_cache(maxsize=1)
-  def get_locations(self):
-    """Return a list of possible locations."""
-    return self.locations
+  def get_truth_locations(self):
+    """Return a list of locations in which ground truth is available."""
+    return Locations.region_list
+
+  @functools.lru_cache(maxsize=1)
+  def get_sensor_locations(self):
+    """Return a list of locations in which sensors are available."""
+    return self.sensor_locations
 
   @functools.lru_cache(maxsize=None)
   def get_missing_locations(self, epiweek):
     """Return a tuple of locations which did not report on the given week."""
 
     # only return missing atoms, i.e. locations that can't be further split
-    atomic_locations = set(self.get_locations()) & set(Locations.atom_list)
+    atomic_locations = set(Locations.atom_list)
 
     available_locations = []
     for loc in atomic_locations:
@@ -141,9 +146,10 @@ class FluDataSource(DataSource):
       return self.epidata.check(response)
 
     weeks = Epidata.range(FluDataSource.FIRST_DATA_EPIWEEK, epiweek)
+    sensor_locations = set(self.get_sensor_locations())
 
     # loop over locations to avoid hitting the limit of ~3.5k rows
-    for loc in self.get_locations():
+    for loc in self.get_truth_locations():
       print('fetching %s...' % loc)
 
       # default to None to prevent cache misses on missing values
@@ -159,7 +165,10 @@ class FluDataSource(DataSource):
         if row['num_providers'] > 0:
           self.add_to_cache('ilinet', loc, row['epiweek'], row['wili'])
 
-      # sensors readings
+      # sensor readings
+      if loc not in sensor_locations:
+        # skip withheld locations (i.e. a retrospective experiment)
+        continue
       for sen in self.get_sensors():
         response = self.epidata.sensors(secrets.api.sensors, sen, loc, weeks)
         for row in extract(response):

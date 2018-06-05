@@ -33,14 +33,15 @@ class UnitTests(unittest.TestCase):
     }]
     data_source = FluDataSource(
         epidata, ['epic', 'sar3'], Locations.region_list)
-    data_source.get_locations = lambda *a: ['nat', 'vi']
+    data_source.get_truth_locations = lambda *a: ['nat', 'vi']
+    data_source.get_sensor_locations = lambda *a: ['nat']
 
     # populate the cache
     data_source.prefetch(201813)
 
     self.assertEqual(epidata.fluview.call_count, 2)
-    self.assertEqual(epidata.sensors.call_count, 4)
-    self.assertEqual(epidata.check.call_count, 6)
+    self.assertEqual(epidata.sensors.call_count, 2)
+    self.assertEqual(epidata.check.call_count, 4)
 
     expected_names = set(['ilinet', 'epic', 'sar3'])
     actual_names = set(data_source.cache)
@@ -55,6 +56,12 @@ class UnitTests(unittest.TestCase):
     value = data_source.get_truth_value(201813, 'nat')
     self.assertEqual(value, 1)
     self.assertEqual(epidata.fluview.call_count, 0)
+
+    # cache "hit" (withheld location)
+    epidata.sensors.reset_mock()
+    value = data_source.get_sensor_value(201813, 'vi', 'epic')
+    self.assertIsNone(value)
+    self.assertEqual(epidata.sensors.call_count, 0)
 
     # cache miss
     epidata.fluview.reset_mock()
@@ -113,7 +120,7 @@ class UnitTests(unittest.TestCase):
             FluDataSource.FIRST_DATA_EPIWEEK, epiweek, inclusive=True))
 
     # actual values
-    actual_locations = set(data_source.get_locations())
+    actual_locations = set(data_source.get_truth_locations())
     actual_missing = set(data_source.get_missing_locations(None))
     actual_sensors = set(data_source.get_sensors())
     actual_weeks = set(data_source.get_weeks())
@@ -144,7 +151,7 @@ class UnitTests(unittest.TestCase):
     # populate the cache
     data_source.prefetch(201453)
 
-    self.assertEqual(epidata.fluview.call_count, 1)
+    self.assertEqual(epidata.fluview.call_count, len(Locations.region_list))
     self.assertEqual(epidata.sensors.call_count, 1)
 
   def test_missing_locations_all_reporting(self):

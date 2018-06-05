@@ -25,8 +25,12 @@ class DataSource(abc.ABC):
   """The interface by which all input data is provided."""
 
   @abc.abstractmethod
-  def get_locations(self):
-    """Return a list of possible locations."""
+  def get_truth_locations(self):
+    """Return a list of locations in which ground truth is available."""
+
+  @abc.abstractmethod
+  def get_sensor_locations(self):
+    """Return a list of locations in which sensors are available."""
 
   @abc.abstractmethod
   def get_missing_locations(self, epiweek):
@@ -144,7 +148,7 @@ class Nowcast:
     """
 
     # get locations and sensors
-    locations = self.data_source.get_locations()
+    locations = self.data_source.get_truth_locations()
     sensors = self.data_source.get_sensors()
     train_weeks = self.data_source.get_weeks()
     num_inputs = len(sensors) * len(locations)
@@ -267,7 +271,7 @@ class Nowcast:
     """
 
     num_sensors = len(self.data_source.get_sensors())
-    num_locations = len(self.data_source.get_locations())
+    num_locations = len(self.data_source.get_sensor_locations())
     num_weeks = len(test_weeks)
     week_range = (min(test_weeks), max(test_weeks))
     cov_impl = self.shrinkage.__name__

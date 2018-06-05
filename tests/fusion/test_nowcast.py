@@ -17,9 +17,12 @@ def get_data_source(truth, sensors, exclude_locations):
 
   class TestDataSource(DataSource):
 
-    def get_locations(self):
+    def get_truth_locations(self):
       first_week = self.get_weeks()[0]
       return sorted(truth[first_week])
+
+    def get_sensor_locations(self):
+      return self.get_truth_locations()
 
     def get_missing_locations(self, epiweek):
       return exclude_locations
