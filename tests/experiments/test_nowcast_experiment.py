@@ -158,27 +158,29 @@ class UnitTests(unittest.TestCase):
   def test_get_covariance_parameters(self):
     """Return sensible covariance parameters."""
 
-    self.mock_data_source.get_weeks.return_value = [1, 2, 3]
+    all_weeks = list(range(20))
+    self.mock_data_source.get_weeks.return_value = all_weeks
 
     params = self.experiment.get_covariance_parameters('bd0')
     sensors, locations, weeks, cov_impl = params
 
     self.assertEqual(sensors, FluDataSource.SENSORS)
     self.assertEqual(locations, Locations.region_list)
-    self.assertEqual(weeks, [1, 2, 3])
+    self.assertEqual(weeks, all_weeks[NowcastExperiment.MIN_OBSERVATIONS:])
     self.assertEqual(cov_impl, covariance.BlendDiagonal0)
 
   def test_get_vanilla_parameters(self):
     """Return parameters used in operational nowcasting."""
 
-    self.mock_data_source.get_weeks.return_value = [1, 2, 3]
+    all_weeks = list(range(20))
+    self.mock_data_source.get_weeks.return_value = all_weeks
 
     params = self.experiment.get_vanilla_parameters()
     sensors, locations, weeks, cov_impl = params
 
     self.assertEqual(sensors, FluDataSource.SENSORS)
     self.assertEqual(locations, Locations.region_list)
-    self.assertEqual(weeks, [1, 2, 3])
+    self.assertEqual(weeks, all_weeks[NowcastExperiment.MIN_OBSERVATIONS:])
     self.assertEqual(cov_impl, covariance.BlendDiagonal2)
 
   def test_get_values_for_experiment(self):
@@ -255,7 +257,8 @@ class UnitTests(unittest.TestCase):
 
     # vanilla
     args = ['filename'] + [None] * 4 + [True]
-    self.mock_data_source.get_weeks.return_value = [1, 2, 3]
+    all_weeks = list(range(10))
+    self.mock_data_source.get_weeks.return_value = all_weeks
     self.experiment.run_experiment(*args)
 
     self.assertTrue(self.mock_data_source.get_weeks.called)
@@ -284,9 +287,9 @@ class UnitTests(unittest.TestCase):
     self.assertTrue(data_source.prefetch.called)
     args, kwargs = data_source.prefetch.call_args
     self.assertEqual(len(args), 1)
-    self.assertEqual(args[0], 3)
+    self.assertEqual(args[0], 9)
 
     self.assertTrue(nowcaster.batch_nowcast.called)
     args, kwargs = nowcaster.batch_nowcast.call_args
     self.assertEqual(len(args), 1)
-    self.assertEqual(args[0], [1, 2, 3])
+    self.assertEqual(args[0], all_weeks[NowcastExperiment.MIN_OBSERVATIONS:])

@@ -169,7 +169,7 @@ class NowcastExperiment:
     # (see ../fusion/covariance.py)
     sensors = FluDataSource.SENSORS
     locations = Locations.region_list
-    weeks = self.data_source.get_weeks()
+    weeks = self.data_source.get_weeks()[NowcastExperiment.MIN_OBSERVATIONS:]
     cov_impl = {
       'bd0': covariance.BlendDiagonal0,
       'bd1': covariance.BlendDiagonal1,
@@ -183,7 +183,7 @@ class NowcastExperiment:
     # all sensors; all locations; all weeks; default covariance method
     sensors = FluDataSource.SENSORS
     locations = Locations.region_list
-    weeks = self.data_source.get_weeks()
+    weeks = self.data_source.get_weeks()[NowcastExperiment.MIN_OBSERVATIONS:]
     cov_impl = covariance.BlendDiagonal2
     return sensors, locations, weeks, cov_impl
 
