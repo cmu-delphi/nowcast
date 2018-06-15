@@ -1,6 +1,7 @@
 """Unit tests for nowcast_experiment.py."""
 
 # standard library
+import argparse
 import unittest
 from unittest.mock import MagicMock
 

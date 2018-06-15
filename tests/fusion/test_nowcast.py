@@ -45,25 +45,25 @@ def get_data_source(truth, sensors, exclude_locations):
 def get_scenario():
   N = None
   truth = {
-    202020: {'jfk': 1, 'nj': 2, 'ny': 3},
-    202021: {'jfk': 4, 'nj': 5, 'ny': 6},
-    202022: {'jfk': N, 'nj': N, 'ny': N},
-    202023: {'jfk': 7, 'nj': N, 'ny': 8},
+    202020: {'jfk': 1, 'nj': 2, 'ny_minus_jfk': 3},
+    202021: {'jfk': 4, 'nj': 5, 'ny_minus_jfk': 6},
+    202022: {'jfk': N, 'nj': N, 'ny_minus_jfk': N},
+    202023: {'jfk': 7, 'nj': N, 'ny_minus_jfk': 8},
   }
   sensors = {
     'a': {
-      202020: {'jfk': 11, 'nj': 21, 'ny': 31},
-      202021: {'jfk': 12, 'nj': 22, 'ny': N},
-      202022: {'jfk': 13, 'nj': 23, 'ny': 33},
-      202023: {'jfk': 14, 'nj': 24, 'ny': 34},
-      202024: {'jfk': 15, 'nj': 25, 'ny': 35},
+      202020: {'jfk': 11, 'nj': 21, 'ny_minus_jfk': 31},
+      202021: {'jfk': 12, 'nj': 22, 'ny_minus_jfk': N},
+      202022: {'jfk': 13, 'nj': 23, 'ny_minus_jfk': 33},
+      202023: {'jfk': 14, 'nj': 24, 'ny_minus_jfk': 34},
+      202024: {'jfk': 15, 'nj': 25, 'ny_minus_jfk': 35},
     },
     'b': {
-      202020: {'jfk': N, 'nj': 41, 'ny': 51},
-      202021: {'jfk': N, 'nj': 42, 'ny': 52},
-      202022: {'jfk': N, 'nj': 43, 'ny': 53},
-      202023: {'jfk': N, 'nj': 44, 'ny': 54},
-      202024: {'jfk': N, 'nj': 45, 'ny': N},
+      202020: {'jfk': N, 'nj': 41, 'ny_minus_jfk': 51},
+      202021: {'jfk': N, 'nj': 42, 'ny_minus_jfk': 52},
+      202022: {'jfk': N, 'nj': 43, 'ny_minus_jfk': 53},
+      202023: {'jfk': N, 'nj': 44, 'ny_minus_jfk': 54},
+      202024: {'jfk': N, 'nj': 45, 'ny_minus_jfk': N},
     },
   }
   # assume HHS2 is only NY + NJ (i.e. pre-2012)
@@ -90,7 +90,11 @@ class UnitTests(unittest.TestCase):
 
     # ('b', 'jfk') is missing because 'jfk' is never provided by sensor 'b'
     self.assertEqual(inputs, [
-      ('a', 'jfk'), ('a', 'nj'), ('a', 'ny'), ('b', 'nj'), ('b', 'ny'),
+      ('a', 'jfk'),
+      ('a', 'nj'),
+      ('a', 'ny_minus_jfk'),
+      ('b', 'nj'),
+      ('b', 'ny_minus_jfk'),
     ])
 
     # expected values for this test scenario
@@ -114,9 +118,9 @@ class UnitTests(unittest.TestCase):
 
     # various slices of the data, based on what's available where and when
     expected_locations = {
-      202022: ('jfk', 'nj', 'nj', 'ny'),
-      202023: ('jfk', 'nj', 'nj', 'ny'),
-      202024: ('jfk', 'nj', 'ny', 'nj'),
+      202022: ('jfk', 'nj', 'nj', 'ny_minus_jfk'),
+      202023: ('jfk', 'nj', 'nj', 'ny_minus_jfk'),
+      202024: ('jfk', 'nj', 'ny_minus_jfk', 'nj'),
     }
     N = np.nan
     expected_noise = {
@@ -188,7 +192,7 @@ class UnitTests(unittest.TestCase):
     self.assertTrue(nc[0][2] < max(A, B))
 
   def test_compute_nowcast_inference(self):
-    input_locations = ('jfk', 'ny')
+    input_locations = ('jfk', 'ny_minus_jfk')
     A, B, C, D = 11, 13, 17, 19
     noise = np.array([
       [A, -B],
@@ -199,9 +203,9 @@ class UnitTests(unittest.TestCase):
         input_locations, noise, reading, BlendDiagonal2)
 
     self.assertEqual(len(nc), 3)
-    self.assertNowcast(nc[1], 'ny', D, B)
+    self.assertNowcast(nc[1], 'ny_minus_jfk', D, B)
     self.assertNowcast(nc[2], 'jfk', C, A)
-    self.assertEqual(nc[0][0], 'ny_state')
+    self.assertEqual(nc[0][0], 'ny')
     self.assertTrue(min(C, D) < nc[0][1] < max(C, D))
     self.assertTrue(nc[0][2] < max(A, B))
 
@@ -227,15 +231,15 @@ class UnitTests(unittest.TestCase):
 
     self.assertEqual(len(ncs), len(test_weeks))
 
-    expected_locations = ['hhs2', 'ny_state', 'nj', 'ny', 'jfk']
+    expected_locations = ['hhs2', 'ny', 'nj', 'ny_minus_jfk', 'jfk']
     for week, nc in zip(test_weeks, ncs):
       with self.subTest(week=week):
         self.assertEqual([l for l, v, s in nc], expected_locations)
-        hhs2, ny_state, nj, ny, jfk = [n[1] for n in nc]
+        hhs2, ny, nj, ny_minus_jfk, jfk = [n[1] for n in nc]
         # ny state is bounded by ny upstate and new york city
-        self.assertTrue(min(ny, jfk) < ny_state < max(ny, jfk))
+        self.assertTrue(min(ny_minus_jfk, jfk) < ny < max(ny_minus_jfk, jfk))
         # hhs2 is bounded by new jersey and new york (pr and vi are excluded)
-        self.assertTrue(min(nj, ny_state) < hhs2 < max(nj, ny_state))
+        self.assertTrue(min(nj, ny) < hhs2 < max(nj, ny))
 
   def test_get_season_early(self):
     self.assertEqual(Nowcast.get_season(201740), 2017)

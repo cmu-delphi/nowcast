@@ -74,6 +74,7 @@ class NowcastExperiment:
 
   @staticmethod
   def new_instance():
+    """Return a production-ready instance."""
     return NowcastExperiment(
         NowcastExperiment.Provider(), Epidata, FluDataSource.new_instance())
 

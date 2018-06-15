@@ -91,7 +91,8 @@ class FluDataSource(DataSource):
       return self.cache['ilinet'][location][epiweek]
     except KeyError:
       print('cache miss: get_truth_value', epiweek, location)
-      response = self.epidata.fluview(location, epiweek)
+      auth = secrets.api.fluview
+      response = self.epidata.fluview(location, epiweek, auth=auth)
       if response['result'] != 1:
         return self.add_to_cache('ilinet', location, epiweek, None)
       data = response['epidata'][0]

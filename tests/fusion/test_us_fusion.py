@@ -104,21 +104,21 @@ class UnitTests(unittest.TestCase):
     self.assertNotIn('tx', outputs)
 
     # hhs2, all atoms
-    inputs = ['nj', 'ny', 'jfk', 'pr', 'vi']
-    expected_outputs = inputs + ['hhs2', 'ny_state']
+    inputs = ['nj', 'ny_minus_jfk', 'jfk', 'pr', 'vi']
+    expected_outputs = inputs + ['hhs2', 'ny']
     H, W, outputs = UsFusion.determine_statespace(tuple(inputs))
     self.assertEqual(set(outputs), set(expected_outputs))
     self.assertEqual(H.shape[1], 5)
 
     # hhs2, missing territories
-    inputs = ['hhs2', 'nj', 'ny', 'jfk']
-    expected_outputs = inputs + ['ny_state']
+    inputs = ['hhs2', 'nj', 'ny_minus_jfk', 'jfk']
+    expected_outputs = inputs + ['ny']
     H, W, outputs = UsFusion.determine_statespace(tuple(inputs))
     self.assertEqual(set(outputs), set(expected_outputs))
     self.assertEqual(H.shape[1], 4)
 
     # hhs2, missing New York atoms
-    inputs = ['nj', 'ny_state', 'pr', 'vi']
+    inputs = ['nj', 'ny', 'pr', 'vi']
     expected_outputs = inputs + ['hhs2']
     H, W, outputs = UsFusion.determine_statespace(tuple(inputs))
     self.assertEqual(set(outputs), set(expected_outputs))
@@ -126,7 +126,7 @@ class UnitTests(unittest.TestCase):
 
     # hhs2, missing all of New York
     inputs = ['hhs2', 'nj', 'pr', 'vi']
-    expected_outputs = inputs + ['ny_state']
+    expected_outputs = inputs + ['ny']
     H, W, outputs = UsFusion.determine_statespace(tuple(inputs))
     self.assertEqual(set(outputs), set(expected_outputs))
     self.assertEqual(H.shape[1], 4)

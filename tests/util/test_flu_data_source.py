@@ -93,7 +93,7 @@ class UnitTests(unittest.TestCase):
       }
 
     # fake implementation of epidata.fluview
-    def get_fluview(loc, week):
+    def get_fluview(loc, week, auth):
       if loc == 'X':
         return fake_api(num_providers=0)
       if loc in locations:
