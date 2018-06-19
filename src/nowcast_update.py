@@ -12,8 +12,8 @@ import argparse
 # first party
 from delphi.epidata.client.delphi_epidata import Epidata
 from delphi.nowcast.fusion.nowcast import Nowcast
-from delphi.nowcast.util.database import NowcastDatabase
 from delphi.nowcast.util.flu_data_source import FluDataSource
+from delphi.nowcast.util.nowcasts_table import NowcastsTable
 from delphi.utils.epiweek import add_epiweeks, range_epiweeks
 
 
@@ -29,7 +29,7 @@ class NowcastUpdate:
     Return a new instance under the default configuration. If `test_mode` is
     true, database changes will not be committed.
     """
-    database = NowcastDatabase.new_instance(test_mode)
+    database = NowcastsTable(test_mode=test_mode)
     data_source = FluDataSource.new_instance()
     return NowcastUpdate(database, data_source)
 

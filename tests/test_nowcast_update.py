@@ -50,29 +50,33 @@ class UnitTests(unittest.TestCase):
     self.assertIsInstance(NowcastUpdate.new_instance(True), NowcastUpdate)
 
   def test_update(self):
-    connector = MagicMock()
-    database = NowcastDatabase(connector, False)
+    database = MagicMock()
+    database.__enter__.return_value = database
+    database.__exit__.return_value = None
     data_source = MagicMock(
         get_truth_locations=lambda *a: ['nat', 'vi'],
         get_sensor_locations=lambda *a: ['nat', 'vi'],
         get_missing_locations=lambda *a: (),
         get_sensors=lambda *a: ['epic', 'sar3'],
         get_most_recent_issue=lambda *a: 201813,
-        get_weeks=lambda *a: list(range_epiweeks(201713, 201813)),
+        get_weeks=lambda *a: list(range_epiweeks(201713, 201814)),
         get_truth_value=lambda *a: random.random(),
         get_sensor_value=lambda *a: random.random(),
         prefetch=lambda *a: None)
 
     NowcastUpdate(database, data_source).update(201812, 201813)
 
-    self.assertEqual(connector.connect.call_count, 1)
-    cnx = connector.connect()
-    self.assertEqual(cnx.cursor.call_count, 1)
-    cur = cnx.cursor()
-    self.assertEqual(cur.execute.call_count, 5)
-    self.assertEqual(cur.close.call_count, 1)
-    self.assertEqual(cnx.commit.call_count, 1)
-    self.assertEqual(cnx.close.call_count, 1)
+    self.assertEqual(database.set_last_update_time.call_count, 1)
+    self.assertEqual(database.insert.call_count, 4)
+
+    epiweek_location_pairs = set()
+    for args, kwargs in database.insert.call_args_list:
+      epiweek_location_pairs.add(args[:2])
+
+    self.assertIn((201812, 'nat'), epiweek_location_pairs)
+    self.assertIn((201813, 'nat'), epiweek_location_pairs)
+    self.assertIn((201812, 'vi'), epiweek_location_pairs)
+    self.assertIn((201813, 'vi'), epiweek_location_pairs)
 
   def test_get_update_range(self):
     data_source = MagicMock(get_most_recent_issue=lambda *a: 201701)

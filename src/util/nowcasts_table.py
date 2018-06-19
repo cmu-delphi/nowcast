@@ -3,7 +3,7 @@
 === Purpose ===
 ===============
 
-A simple wrapper for the nowcast database.
+A simple wrapper for the `nowcasts` table in the Delphi database.
 
 
 =======================
@@ -27,21 +27,16 @@ value: nowcast point prediction
 std: nowcast standard deviation
 """
 
-
 # standard library
 import time
 
-# third party
-import mysql.connector
-
 # first party
+from delphi.nowcast.util.delphi_database import DelphiDatabase
 from delphi.operations import secrets
 
 
-class NowcastDatabase:
-  """
-  A database wrapper that provides an interface for updating the nowcast table.
-  """
+class NowcastsTable(DelphiDatabase.Table):
+  """A database wrapper for the `nowcasts` table."""
 
   SQL_INSERT = """
     INSERT INTO `nowcasts`
@@ -52,43 +47,13 @@ class NowcastDatabase:
       value = %s, std = %s
   """
 
-  @staticmethod
-  def new_instance(test_mode):
-    """
-    Return a new instance under the default configuration. If `test_mode` is
-    true, database changes will not be committed.
-    """
-    return NowcastDatabase(mysql.connector, test_mode)
-
-  def __init__(self, connector, test_mode):
-    self.connector = connector
-    self.test_mode = test_mode
-
-  def connect(self):
-    """Open a connection to the database."""
-    u, p = secrets.db.epi
-    self.cnx = self.connector.connect(user=u, password=p, database='epidata')
-    self.cur = self.cnx.cursor()
-
-  def disconnect(self):
-    """
-    Close the connection to the database. Unless test mode is enabled,
-    outstanding changes will be committed at this point.
-    """
-    self.cur.close()
-    if self.test_mode:
-      print('test mode - nowcasts not saved')
-    else:
-      self.cnx.commit()
-    self.cnx.close()
-
   def insert(self, epiweek, location, value, stdev):
     """
     Add a new nowcast record to the database, or update an existing record with
     the same key.
     """
     args = (epiweek, location, value, stdev, value, stdev)
-    self.cur.execute(NowcastDatabase.SQL_INSERT, args)
+    self._database.execute(NowcastsTable.SQL_INSERT, args)
 
   def set_last_update_time(self):
     """
@@ -104,9 +69,6 @@ class NowcastDatabase:
     a, b = t // 100000, t % 100000
     self.insert(0, 'updated', a, b)
 
-  def __enter__(self):
-    self.connect()
-    return self
-
-  def __exit__(self, *error):
-    self.disconnect()
+  def _get_connection_info(self):
+    """Return username, password, and database name."""
+    return secrets.db.epi + ('epidata',)
