@@ -1,4 +1,4 @@
-"""Unit tests for database.py."""
+"""Unit tests for nowcasts_table.py."""
 
 # standard library
 import unittest

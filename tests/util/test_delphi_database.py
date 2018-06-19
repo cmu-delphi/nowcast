@@ -1,4 +1,4 @@
-"""Unit tests for database.py."""
+"""Unit tests for delphi_database.py."""
 
 # standard library
 import unittest
