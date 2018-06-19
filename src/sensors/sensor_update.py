@@ -106,9 +106,9 @@ import mysql.connector
 import numpy as np
 
 # first party
-from .arch import ARCH
-from .sar3 import SAR3
 from delphi.epidata.client.delphi_epidata import Epidata
+from delphi.nowcast.sensors.arch import ARCH
+from delphi.nowcast.sensors.sar3 import SAR3
 import delphi.operations.secrets as secrets
 from delphi.utils.epidate import EpiDate
 import delphi.utils.epiweek as flu

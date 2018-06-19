@@ -44,8 +44,8 @@ import numpy as np
 from undefx.undef_analysis.neldermead import NelderMead
 
 # first party
-from .archetype import Archetype
 from delphi.epidata.client.delphi_epidata import Epidata
+from delphi.nowcast.sensors.archetype import Archetype
 import delphi.utils.epiweek as EW
 
 
