@@ -93,4 +93,5 @@ class DelphiDatabase:
 
   def execute(self, sql, args):
     """The database cursor."""
-    return self.__cur.execute(sql, args)
+    self.__cur.execute(sql, args)
+    return self.__cur

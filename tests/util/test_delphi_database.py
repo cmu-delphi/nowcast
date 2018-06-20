@@ -52,9 +52,10 @@ class UnitTests(unittest.TestCase):
 
     connector = MagicMock()
     with DelphiDatabase(connector, False, 'u', 'p', 'd') as db:
-      db.execute('sql', 'args')
+      returned_cursor = db.execute('sql', 'args')
 
     cur = connector.connect().cursor()
+    self.assertIs(returned_cursor, cur)
     self.assertEqual(cur.execute.call_count, 1)
     args, kwargs = cur.execute.call_args
     sql, args = args
