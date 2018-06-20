@@ -98,6 +98,7 @@ Locations vary by data source, but include all of:
 
 # standard library
 import argparse
+import re
 import subprocess
 import sys
 
@@ -115,11 +116,11 @@ import delphi.utils.epiweek as flu
 from delphi.utils.state_info import StateInfo
 
 
-def get_most_recent_issue():
+def get_most_recent_issue(epidata):
   # search for FluView issues within the last 10 weeks
   ew2 = EpiDate.today().get_ew()
   ew1 = flu.add_epiweeks(ew2, -9)
-  rows = Epidata.check(Epidata.fluview('nat', Epidata.range(ew1, ew2)))
+  rows = epidata.check(epidata.fluview('nat', epidata.range(ew1, ew2)))
   return max([row['issue'] for row in rows])
 
 
@@ -317,18 +318,19 @@ def get_ght(location, epiweek, valid):
 
 def get_ghtj(location, epiweek, valid):
   loc = 'US' if location == 'nat' else location
+
   def justinfun(location, epiweek):
-    main_driver = '/home/automation/ghtj/ghtj.R'   ### Need to set an absolute path
-    subprocess.check_call(['Rscript', main_driver, location, str(epiweek)], shell=False)
-    outputdir = '/home/automation/ghtj/output' ### Need to set an absolute path
+    # Need to set an absolute path
+    main_driver = '/home/automation/ghtj/ghtj.R'
+    args = ['Rscript', main_driver, location, str(epiweek)]
+    subprocess.check_call(args, shell=False)
+    # Need to set an absolute path
+    outputdir = '/home/automation/ghtj/output'
     prefix = 'ghtpred'
-    predfilename = outputdir + '/' + prefix + '-'+ loc +'-' + str(epiweek) + '.txt'
-    # file = open(outputdir + prefix + str(epiweek) + '.txt', 'r')
-    file = open(predfilename, 'r')
-    mypred = file.read()
-    mypred = float(mypred)
+    predfilename = '%s/%s-%s-%d.txt' % (outputdir, prefix, loc, epiweek)
+    with open(predfilename, 'r') as f:
+      mypred = float(f.read())
     print(mypred)
-    file.close()
     return mypred
 
   # Making the single prediction now:
@@ -355,12 +357,21 @@ def get_twtr(location, epiweek, valid):
 def get_wiki(location, epiweek, valid):
   if location != 'nat':
     raise Exception('wiki is only available for nat')
-  articles = ['human_flu', 'influenza', 'influenza_a_virus', 'influenzavirus_a', 'influenzavirus_c', 'oseltamivir', 'zanamivir']
+  articles = [
+    'human_flu',
+    'influenza',
+    'influenza_a_virus',
+    'influenzavirus_a',
+    'influenzavirus_c',
+    'oseltamivir',
+    'zanamivir',
+  ]
   hours = [17, 18, 21]
   # There are 21 time series (7 articles, 3 hours) of N epiweeks. Each time
   # series needs to be fetched, and then the whole dataset needs to be pivoted
   # so that there are N rows, each with 21 values.
   fields = ['f%d' % i for i in range(len(articles) * len(hours))]
+
   def fetch(weeks):
     # a map from epiweeks to a map of field-value pairs (for each article/hour)
     data = {}
@@ -392,11 +403,13 @@ def get_wiki(location, epiweek, valid):
       'message': None,
       'epidata': rows,
     }
+
   return get_prediction(location, epiweek, 'wiki', fields, fetch, valid)
 
 
 def get_cdc(location, epiweek, valid):
   fields = ['num2', 'num4', 'num5', 'num6', 'num7', 'num8']
+
   def fetch(weeks):
     # It appears that log-transformed counts provide a much better fit.
     res = Epidata.cdc(secrets.api.cdc, weeks, location)
@@ -405,6 +418,7 @@ def get_cdc(location, epiweek, valid):
         for col in fields:
           row[col] = np.log(1. + row[col])
     return res
+
   return get_prediction(location, epiweek, 'cdc', fields, fetch, valid)
 
 
@@ -415,9 +429,11 @@ def get_epic(location, epiweek, valid):
 
 def get_quid(location, epiweek, valid):
   fields = ['value']
+
   def fetch(weeks):
     res = Epidata.quidel(secrets.api.quidel, weeks, location)
     return res
+
   return get_prediction(location, epiweek, 'quid', fields, fetch, valid)
 
 
@@ -429,9 +445,9 @@ def get_arch(location, epiweek, valid):
   return ARCH(location).predict(epiweek, valid=valid)
 
 
-def update(sensors, first_week=None, last_week=None, valid=False, test_mode=False):
+def update(sensors, first_week, last_week, valid, test_mode):
   # most recent issue
-  last_issue = get_most_recent_issue()
+  last_issue = get_most_recent_issue(Epidata)
 
   # location information
   loc_info = StateInfo()
@@ -490,29 +506,76 @@ def update(sensors, first_week=None, last_week=None, valid=False, test_mode=Fals
   cnx.close()
 
 
-if __name__ == '__main__':
-  # args and usage
+def get_argument_parser():
+  """Define command line arguments and usage."""
   parser = argparse.ArgumentParser()
-  parser.add_argument('names', type=str, help='list of name-location pairs (location can be nat/hhs/cen/state or specific location labels)')
-  parser.add_argument('--first', '-f', default=None, type=int, help='first epiweek override')
-  parser.add_argument('--last', '-l', default=None, type=int, help='last epiweek override')
-  parser.add_argument('--epiweek', '-w', default=None, type=int, help='epiweek override')
-  parser.add_argument('--test', '-t', default=False, action='store_true', help='dry run only')
-  parser.add_argument('--valid', '-v', default=False, action='store_true', help='do not fall back to stable wILI; require unstable wILI')
-  args = parser.parse_args()
+  parser.add_argument(
+      'names',
+      help=(
+        'list of name-location pairs '
+        '(location can be nat/hhs/cen/state or specific location labels)'))
+  parser.add_argument(
+      '--first',
+      '-f',
+      type=int,
+      help='first epiweek override')
+  parser.add_argument(
+      '--last',
+      '-l',
+      type=int,
+      help='last epiweek override')
+  parser.add_argument(
+      '--epiweek',
+      '-w',
+      type=int,
+      help='epiweek override')
+  parser.add_argument(
+      '--test',
+      '-t',
+      default=False,
+      action='store_true',
+      help='dry run only')
+  parser.add_argument(
+      '--valid',
+      '-v',
+      default=False,
+      action='store_true',
+      help='do not fall back to stable wILI; require unstable wILI')
+  return parser
 
-  # sanity check
+
+def validate_args(args):
+  """Validate and return command line arguments."""
+
+  # check epiweek specification
   first, last, week = args.first, args.last, args.epiweek
   for ew in [first, last, week]:
     if ew is not None:
       flu.check_epiweek(ew)
-  if first is not None and last is not None and first > last:
-    raise Exception('epiweeks in the wrong order')
   if week is not None:
+    if first is not None or last is not None:
+      raise ValueError('`week` overrides `first` and `last`')
     first = last = week
+  if first is not None and last is not None and first > last:
+    raise ValueError('`first` must not be greater than `last`')
 
-  # extract name-location pairs
-  sensors = [pair.split('-') for pair in args.names.split(',')]
+  # validate and extract name-location pairs
+  pair_regex = '[^-,]+-[^-,]+'
+  names_regex = '%s(,%s)*' % (pair_regex, pair_regex)
+  if not re.match(names_regex, args.names):
+    raise ValueError('invalid sensor specification')
 
-  # update the requested sensors
-  update(sensors, first, last, args.valid, args.test)
+  return args.names, first, last, args.valid, args.test
+
+
+def parse_sensor_location_pairs(names):
+  return [pair.split('-') for pair in names.split(',')]
+
+
+def main(names, first, last, valid, test):
+  """Run this script from the command line."""
+  update(parse_sensor_location_pairs(names), first, last, valid, test)
+
+
+if __name__ == '__main__':
+  main(*validate_args(get_argument_parser().parse_args()))
