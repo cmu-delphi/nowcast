@@ -38,14 +38,14 @@ from delphi.operations import secrets
 class NowcastsTable(DelphiDatabase.Table):
   """A database wrapper for the `nowcasts` table."""
 
-  SQL_INSERT = """
+  SQL_INSERT = '''
     INSERT INTO `nowcasts`
       (`epiweek`, `location`, `value`, `std`)
     VALUES
       (%s, %s, %s, %s)
     ON DUPLICATE KEY UPDATE
       value = %s, std = %s
-  """
+  '''
 
   def insert(self, epiweek, location, value, stdev):
     """
