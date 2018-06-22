@@ -20,9 +20,12 @@ class UnitTests(unittest.TestCase):
     random.seed(12345)
 
   def test_get_argument_parser(self):
+    """An ArgumentParser should be returned."""
     self.assertIsInstance(get_argument_parser(), argparse.ArgumentParser)
 
   def test_validate_args(self):
+    """Arguments should be validated."""
+
     with self.subTest(name='first only'):
       args = MagicMock(first=2, last=None, test=False)
       with self.assertRaises(Exception):
@@ -47,9 +50,12 @@ class UnitTests(unittest.TestCase):
       self.assertEqual(validate_args(args), (None, None, True))
 
   def test_new_instance(self):
+    """Create a NowcastUpdate instance with default parameters."""
     self.assertIsInstance(NowcastUpdate.new_instance(True), NowcastUpdate)
 
   def test_update(self):
+    """Compute and store a nowcast."""
+
     database = MagicMock()
     database.__enter__.return_value = database
     database.__exit__.return_value = None
@@ -79,6 +85,8 @@ class UnitTests(unittest.TestCase):
     self.assertIn((201813, 'vi'), epiweek_location_pairs)
 
   def test_get_update_range(self):
+    """Get the range of epiweeks to be updated."""
+
     data_source = MagicMock(get_most_recent_issue=lambda *a: 201701)
     updater = NowcastUpdate(None, data_source)
 
