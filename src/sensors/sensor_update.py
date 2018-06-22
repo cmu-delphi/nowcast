@@ -29,71 +29,6 @@ See also:
   - signal_update.py
   - sar3.py
   - arch.py
-
-
-=======================
-=== Data Dictionary ===
-=======================
-
-`sensors` is the table where the data is stored.
-+----------+------------+------+-----+---------+----------------+
-| Field    | Type       | Null | Key | Default | Extra          |
-+----------+------------+------+-----+---------+----------------+
-| id       | int(11)    | NO   | PRI | NULL    | auto_increment |
-| name     | varchar(8) | NO   | MUL | NULL    |                |
-| epiweek  | int(11)    | NO   | MUL | NULL    |                |
-| location | varchar(8) | NO   | MUL | NULL    |                |
-| value    | float      | NO   |     | NULL    |                |
-+----------+------------+------+-----+---------+----------------+
-id: unique identifier for each record
-name: the name of the signal (ex: 'wiki')
-epiweek: the epiweek during which the data was collected
-location: where the data was collected (see below)
-value: the estimated final value of (w)ILI on this epiweek
-
-Locations vary by data source, but include all of:
-  - 'nat' (U.S. National): 1
-  - 'hhs[1-10]' (HHS regions): 10
-  - 'cen[1-9]' (Census regions): 9
-  - '[two-letter state]' (U.S. states and DC): 51
-
-
-=================
-=== Changelog ===
-=================
-
-2017-12-15
-  + add `quid` data source
-2017-01-31
-  + updated `wiki` to use the same fitting procedure as everything else
-2016-12-13
-  + use secrets
-2016-04-22
-  + include periodic bias when signal is observed at least a year
-  * fit pre/post 2013w40 `gft` separately
-  * replace `cdc` sqrt-transform with log-transform
-2016-04-20
-  * reworked the weight function to (hopefully) reduce bias
-2016-04-18
-  * don't use `num1` and `num3` for `cdc`
-  * sqrt-transform `cdc` before fitting
-2016-04-16
-  + added --epiweek argument
-  * from single to multiple regression (for `cdc`)
-2016-04-14
-  * work with missing state ili
-  * ght at state level
-2016-04-11
-  + switch for valid/invalid mode (whether to force use of unstable wILI)
-  + flush output for use with `tee`
-  * aesthetic edits
-2016-04-09
-  * fixed Exception message formatting
-  * impute missing twtr values as 0%
-2016-04-08
-  + finished implementing all sensors
-2016-04-07
-  + initial version (based heavily on signal_update.py)
 """
 
 # standard library
@@ -103,17 +38,17 @@ import subprocess
 import sys
 
 # third party
-import mysql.connector
 import numpy as np
 
 # first party
 from delphi.epidata.client.delphi_epidata import Epidata
 from delphi.nowcast.sensors.arch import ARCH
 from delphi.nowcast.sensors.sar3 import SAR3
+from delphi.nowcast.util.sensors_table import SensorsTable
 import delphi.operations.secrets as secrets
 from delphi.utils.epidate import EpiDate
 import delphi.utils.epiweek as flu
-from delphi.utils.state_info import StateInfo
+from delphi.utils.geo.locations import Locations
 
 
 def get_most_recent_issue(epidata):
@@ -122,40 +57,6 @@ def get_most_recent_issue(epidata):
   ew1 = flu.add_epiweeks(ew2, -9)
   rows = epidata.check(epidata.fluview('nat', epidata.range(ew1, ew2)))
   return max([row['issue'] for row in rows])
-
-
-def get_last_update(cur, name, location):
-  # find the last epiweek for which this signal is available
-  sql = '''
-    SELECT
-      max(`epiweek`)
-    FROM
-      `sensors`
-    WHERE
-      `name` = %s AND `location` = %s
-  '''
-  args = (name, location)
-  cur.execute(sql, args)
-  epiweek = None
-  for (epiweek,) in cur:
-    pass
-  if epiweek is None:
-    raise Exception('%s-%s does not exist yet' % (name, location))
-  return epiweek
-
-
-def store_value(cur, name, location, epiweek, value):
-  # find the last epiweek for which this signal is available
-  sql = '''
-    INSERT INTO
-      `sensors` (`name`, `location`, `epiweek`, `value`)
-    VALUES
-      (%s, %s, %s, %s)
-    ON DUPLICATE KEY UPDATE
-      `value` = %s
-  '''
-  args = (name, location, epiweek, value, value)
-  cur.execute(sql, args)
 
 
 def dot(*Ms):
@@ -251,7 +152,7 @@ def get_training_set(location, epiweek, signal, valid):
     result = Epidata.fluview(location, weeks0, issues=ew2, auth=auth)
     rows = Epidata.check(result)
     unstable = extract(rows, ['wili'])
-  except:
+  except Exception:
     unstable = {}
   rows = Epidata.check(Epidata.fluview(location, weeks0, auth=auth))
   stable = extract(rows, ['wili'])
@@ -445,65 +346,112 @@ def get_arch(location, epiweek, valid):
   return ARCH(location).predict(epiweek, valid=valid)
 
 
-def update(sensors, first_week, last_week, valid, test_mode):
-  # most recent issue
-  last_issue = get_most_recent_issue(Epidata)
+class UnknownLocationException(Exception):
+  """An Exception indicating that the given location is not known."""
 
-  # location information
-  loc_info = StateInfo()
 
-  # connect
-  u, p = secrets.db.epi
-  cnx = mysql.connector.connect(user=u, password=p, database='epidata')
-  cur = cnx.cursor()
+def get_sensor_implementations():
+  """Return a map from sensor names to sensor implementations."""
+  return {
+    'gft': get_gft,
+    'ght': get_ght,
+    'ghtj': get_ghtj,
+    'twtr': get_twtr,
+    'wiki': get_wiki,
+    'cdc': get_cdc,
+    'epic': get_epic,
+    'sar3': get_sar3,
+    'arch': get_arch,
+    'quid': get_quid,
+  }
 
-  # update each sensor
-  for (name, loc) in sensors:
-    if loc == 'hhs':
-      locations = loc_info.hhs
-    elif loc == 'cen':
-      locations = loc_info.cen
-    elif loc == 'state' or loc == 'sta':
-      locations = loc_info.sta
-    else:
-      locations = [loc]
-    # update each location
-    for location in locations:
-      # timing
-      ew1, ew2 = first_week, last_week
-      if ew1 is None:
-        ew1 = get_last_update(cur, name, location)
-      if ew2 is None:
-        ew2 = flu.add_epiweeks(last_issue, +1)
-      print('Updating %s-%s from %d to %d.' % (name, location, ew1, ew2))
-      for test_week in flu.range_epiweeks(ew1, ew2, inclusive=True):
-        train_week = flu.add_epiweeks(test_week, -1)
-        try:
-          value = {
-            'gft': get_gft,
-            'ght': get_ght,
-            'ghtj': get_ghtj,
-            'twtr': get_twtr,
-            'wiki': get_wiki,
-            'cdc': get_cdc,
-            'epic': get_epic,
-            'sar3': get_sar3,
-            'arch': get_arch,
-            'quid': get_quid,
-          }[name](location, train_week, valid)
-          print(' %4s %5s %d -> %.3f' % (name, location, test_week, value))
-          # upload
-          store_value(cur, name, location, test_week, value)
-        except Exception as ex:
-          print(' failed: %4s %5s %d' % (name, location, test_week), ex)
-          #raise ex
-        sys.stdout.flush()
 
-  # disconnect
-  cur.close()
-  if not test_mode:
-    cnx.commit()
-  cnx.close()
+def get_location_list(loc):
+  """Return the list of locations described by the given string."""
+  if loc == 'all':
+    return Locations.region_list
+  elif loc == 'hhs':
+    return Locations.hhs_list
+  elif loc == 'cen':
+    return Locations.cen_list
+  elif loc in Locations.region_list:
+    return [loc]
+  else:
+    raise UnknownLocationException('unknown location: %s' % str(loc))
+
+
+class SensorUpdate:
+  """
+  Produces both real-time and retrospective sensor readings for ILI in the US.
+  Readings (predictions of ILI made using raw inputs) are stored in the Delphi
+  database and are accessible via the Epidata API.
+  """
+
+  @staticmethod
+  def new_instance(valid, test_mode):
+    """
+    Return a new instance under the default configuration.
+
+    If `test_mode` is True, database changes will not be committed.
+
+    If `valid` is True, be punctilious about hiding values that were not known
+    at the time (e.g. run the model with preliminary ILI only). Otherwise, be
+    more lenient (e.g. fall back to final ILI when preliminary ILI isn't
+    available).
+    """
+    database = SensorsTable(test_mode=test_mode)
+    implementations = get_sensor_implementations()
+    return SensorUpdate(valid, database, implementations, Epidata)
+
+  def __init__(self, valid, database, implementations, epidata):
+    self.valid = valid
+    self.database = database
+    self.implementations = implementations
+    self.epidata = epidata
+
+  def update(self, sensors, first_week, last_week):
+    """
+    Compute sensor readings and store them in the database.
+    """
+
+    # most recent issue
+    if last_week is None:
+      last_issue = get_most_recent_issue(self.epidata)
+      last_week = flu.add_epiweeks(last_issue, +1)
+
+    # connect
+    with self.database as database:
+
+      # update each sensor
+      for (name, loc) in sensors:
+
+        # update each location
+        for location in get_location_list(loc):
+
+          # timing
+          ew1 = first_week
+          if ew1 is None:
+            ew1 = database.get_most_recent_epiweek(name, location)
+            if ew1 is None:
+              raise ValueError('%s-%s does not exist yet' % (name, location))
+
+          args = (name, location, ew1, last_week)
+          print('Updating %s-%s from %d to %d.' % args)
+          for test_week in flu.range_epiweeks(ew1, last_week, inclusive=True):
+            self.update_single(database, test_week, name, location)
+
+  def update_single(self, database, test_week, name, location):
+    train_week = flu.add_epiweeks(test_week, -1)
+    impl = self.implementations[name]
+    try:
+      value = impl(location, train_week, self.valid)
+      print(' %4s %5s %d -> %.3f' % (name, location, test_week, value))
+    except Exception as ex:
+      value = None
+      print(' failed: %4s %5s %d' % (name, location, test_week), ex)
+    if value is not None:
+      database.insert(name, location, test_week, value)
+    sys.stdout.flush()
 
 
 def get_argument_parser():
@@ -574,7 +522,8 @@ def parse_sensor_location_pairs(names):
 
 def main(names, first, last, valid, test):
   """Run this script from the command line."""
-  update(parse_sensor_location_pairs(names), first, last, valid, test)
+  sensors = parse_sensor_location_pairs(names)
+  SensorUpdate.new_instance(valid, test).update(sensors, first, last)
 
 
 if __name__ == '__main__':
