@@ -11,15 +11,15 @@ A simple wrapper for the `nowcasts` table in the Delphi database.
 =======================
 
 Nowcasts (value and standard deviation) are stored in the `nowcasts` table.
-+----------+------------+------+-----+---------+----------------+
-| Field    | Type       | Null | Key | Default | Extra          |
-+----------+------------+------+-----+---------+----------------+
-| id       | int(11)    | NO   | PRI | NULL    | auto_increment |
-| epiweek  | int(11)    | NO   | MUL | NULL    |                |
-| location | varchar(8) | NO   | MUL | NULL    |                |
-| value    | float      | NO   |     | NULL    |                |
-| std      | float      | NO   |     | NULL    |                |
-+----------+------------+------+-----+---------+----------------+
++----------+-------------+------+-----+---------+----------------+
+| Field    | Type        | Null | Key | Default | Extra          |
++----------+-------------+------+-----+---------+----------------+
+| id       | int(11)     | NO   | PRI | NULL    | auto_increment |
+| epiweek  | int(11)     | NO   | MUL | NULL    |                |
+| location | varchar(12) | YES  | MUL | NULL    |                |
+| value    | float       | NO   |     | NULL    |                |
+| std      | float       | NO   |     | NULL    |                |
++----------+-------------+------+-----+---------+----------------+
 id: unique identifier for each record
 epiweek: the epiweek for which (w)ILI is being predicted
 location: where the data was collected (nat, hhs, cen, and states)

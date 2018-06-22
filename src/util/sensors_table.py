@@ -11,15 +11,15 @@ A simple wrapper for the `sensors` table in the Delphi database.
 =======================
 
 `sensors` is the table where the data is stored.
-+----------+------------+------+-----+---------+----------------+
-| Field    | Type       | Null | Key | Default | Extra          |
-+----------+------------+------+-----+---------+----------------+
-| id       | int(11)    | NO   | PRI | NULL    | auto_increment |
-| name     | varchar(8) | NO   | MUL | NULL    |                |
-| epiweek  | int(11)    | NO   | MUL | NULL    |                |
-| location | varchar(8) | NO   | MUL | NULL    |                |
-| value    | float      | NO   |     | NULL    |                |
-+----------+------------+------+-----+---------+----------------+
++----------+-------------+------+-----+---------+----------------+
+| Field    | Type        | Null | Key | Default | Extra          |
++----------+-------------+------+-----+---------+----------------+
+| id       | int(11)     | NO   | PRI | NULL    | auto_increment |
+| name     | varchar(8)  | NO   | MUL | NULL    |                |
+| epiweek  | int(11)     | NO   | MUL | NULL    |                |
+| location | varchar(12) | YES  | MUL | NULL    |                |
+| value    | float       | NO   |     | NULL    |                |
++----------+-------------+------+-----+---------+----------------+
 id: unique identifier for each record
 name: the name of the signal (ex: 'wiki')
 epiweek: the epiweek during which the data was collected
