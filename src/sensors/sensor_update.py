@@ -433,7 +433,11 @@ class SensorUpdate:
           if ew1 is None:
             ew1 = database.get_most_recent_epiweek(name, location)
             if ew1 is None:
-              raise ValueError('%s-%s does not exist yet' % (name, location))
+              # If an existing sensor reading wasn't found in the database and
+              # no start week was given, just assume that readings should start
+              # at 2010w40.
+              ew1 = 201040
+              print('%s-%s not found, starting at %d' % (name, location, ew1))
 
           args = (name, location, ew1, last_week)
           print('Updating %s-%s from %d to %d.' % args)

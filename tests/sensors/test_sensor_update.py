@@ -216,22 +216,37 @@ class UnitTests(unittest.TestCase):
     self.assertEqual(args[3], ('s2', 'or', 201821, 2))
 
   def test_update_with_unknown_epiweek(self):
-    """Fail to bulk update sensor readings."""
+    """Bulk update sensor readings for a new sensor."""
 
     database = MagicMock()
     database.__enter__.return_value = database
     database.get_most_recent_epiweek.return_value = None
 
+    impl1 = MagicMock(return_value=1)
+    impl2 = MagicMock(return_value=2)
+    implementations = {'s1': impl1, 's2': impl2}
+
     sensors = [('s1', 'ar'), ('s2', 'or')]
 
-    sensor_update = SensorUpdate(True, database, None, None)
+    sensor_update = SensorUpdate(True, database, implementations, None)
+    sensor_update.update(sensors, None, 201040)
 
-    with self.assertRaises(ValueError):
-      sensor_update.update(sensors, None, 201820)
+    args = [a for a, k in database.get_most_recent_epiweek.call_args_list]
+    self.assertEqual(args[0], ('s1', 'ar'))
+    self.assertEqual(args[1], ('s2', 'or'))
 
-    self.assertEqual(database.get_most_recent_epiweek.call_count, 1)
-    args, kwargs = database.get_most_recent_epiweek.call_args
-    self.assertEqual(args, ('s1', 'ar'))
+    self.assertEqual(impl1.call_count, 1)
+    args, kwargs = impl1.call_args
+    self.assertEqual(args, ('ar', 201039, True))
+
+    self.assertEqual(impl2.call_count, 1)
+    args, kwargs = impl2.call_args
+    self.assertEqual(args, ('or', 201039, True))
+
+    self.assertEqual(database.insert.call_count, 2)
+    args = [a for a, k in database.insert.call_args_list]
+    self.assertEqual(args[0], ('s1', 'ar', 201040, 1))
+    self.assertEqual(args[1], ('s2', 'or', 201040, 2))
 
   def test_update_with_failing_sensors(self):
     """Bulk update sensor readings with some missing values."""
