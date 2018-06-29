@@ -231,11 +231,52 @@ influenza activity in the US---nationally, regionally, and for all states.
 % Use "Eq" instead of "Equation" for equation citations.
 \section*{Introduction}
 
-TODO~\cite{farrow2016modeling}.
+\subsection*{Background}
+
+Annual influenza epidemics incur tremendous expenses and are strongly
+detrimental to societal wellbeing \cite{szucs1999socio, Stohr2002,
+molinari2007annual, who_flu_impact}. One way in which these impacts can be
+lessened is though outbreak forewarning and therefore improved preparedness
+\cite{myers2000}. This has been a primary impetus in the development of a large
+number of influenza forecasting frameworks in recent years \cite{nsoesie2013a,
+chretien2014, brooks2015, farrow2017human}. TODO(cite new brooks, cdc papers)
+
+Forecasting critically depends on timely and accurate situational awareness,
+and in the United States (US) one widespread measure of influenza burden is the
+population-weighted percent influenza-like illness (wILI), derived from the US
+Outpatient Influenza-Like Illness Surveillance Network (ILINet). On a weekly
+basis, health care providers who have volunteered to participate in the ILINet
+program submit, among other data, the percent of their cases that have met the
+syndromic criteria of Influenza-Like Illness (\%ILI)---fever with either cough
+or sore throat, without a known cause other than influenza \cite{wilidef,
+who_ili_def}. The US Centers for Disease Control and Prevention (CDC) publishes
+weekly wILI---a weighted combination of state \%ILI---for several locations
+within the US, including the ten Health and Human Services (HHS) regions, the
+nine census divisions, and the majority of US states and territories.
+
+Although \%ILI, and by extension wILI, is highly beneficial in a number of
+settings \cite{ritzwoller2005comparison, thompson2006epidemiology,
+m2008infectious}, it is ill-suited for real-time estimation of influenza
+activity for several reasons. First, there is an inherent delay of one or more
+weeks between patient care and wILI availability. In the typical and best case,
+data collected between Sunday and Saturday of some week is reported on Friday
+of the following week. Second, wILI is subject to retrospective and significant
+revision due to a process we refer to as ``backfill''. Backfill is the eventual
+incorporation of reports submitted multiple weeks after patient care, and with
+the additional data comes a different, but more representative, value of wILI.
+Third, wILI is aggregated across broad geographic regions before publication.
+It is well known, however, that the spread of influenza---particularly around
+the peak of the epidemic---is spatially heterogeneous between and within states
+\cite{bonabeau1998geographical, viboud2006synchrony, eggo2010spatial,
+viboud2013contrasting, gog2014spatial}, and therefore regional, divisional, and
+especially national wILI is a convolution of influenza activity within
+constituent states.
+
+TODO
 
 \section*{Materials and methods}
 
-TODO
+TODO~\cite{farrow2016modeling}
 
 % Results and Discussion can be combined.
 \section*{Results}
@@ -268,10 +309,117 @@ TODO
 % step-by-step instructions.
 
 % Uncomment this to generate the *.bbl file.
-\bibliography{references}
+%\bibliography{references}
 
 % Paste the contents of the *.bbl file below this line.
-\begin{thebibliography}{1}
+\begin{thebibliography}{10}
+
+\bibitem{szucs1999socio}
+Szucs T.
+\newblock The socio-economic burden of influenza.
+\newblock Journal of Antimicrobial Chemotherapy. 1999;44(suppl 2):11--15.
+
+\bibitem{Stohr2002}
+St{\"o}hr K.
+\newblock Influenza--WHO cares.
+\newblock The Lancet Infectious diseases. 2002;2(9):517--517.
+
+\bibitem{molinari2007annual}
+Molinari NAM, Ortega-Sanchez IR, Messonnier ML, Thompson WW, Wortley PM,
+  Weintraub E, et~al.
+\newblock The annual impact of seasonal influenza in the US: measuring disease
+  burden and costs.
+\newblock Vaccine. 2007;25(27):5086--5096.
+
+\bibitem{who_flu_impact}
+Influenza (Seasonal); 2018.
+\newblock Available from:
+  \url{http://www.who.int/mediacentre/factsheets/fs211/en/}.
+
+\bibitem{myers2000}
+Myers MF, Rogers D, Cox J, Flahault A, Hay S.
+\newblock Forecasting disease risk for increased epidemic preparedness in
+  public health.
+\newblock Advances in Parasitology. 2000;47:309--330.
+
+\bibitem{nsoesie2013a}
+Nsoesie EO, Brownstein JS, Ramakrishnan N, Marathe MV.
+\newblock A systematic review of studies on forecasting the dynamics of
+  influenza outbreaks.
+\newblock Influenza Other Respi Viruses. 2013;8(3):309--316.
+\newblock doi:{10.1111/irv.12226}.
+
+\bibitem{chretien2014}
+Chretien JP, George D, Shaman J, Chitale RA, McKenzie FE.
+\newblock Influenza Forecasting in Human Populations: A Scoping Review.
+\newblock {PLoS} {ONE}. 2014;9(4):e94130.
+\newblock doi:{10.1371/journal.pone.0094130}.
+
+\bibitem{brooks2015}
+Brooks LC, Farrow DC, Hyun S, Tibshirani RJ, Rosenfeld R.
+\newblock Flexible Modeling of Epidemics with an Empirical Bayes Framework.
+\newblock {PLOS} Computational Biology. 2015;11(8):e1004382.
+\newblock doi:{10.1371/journal.pcbi.1004382}.
+
+\bibitem{farrow2017human}
+Farrow DC, Brooks LC, Hyun S, Tibshirani RJ, Burke DS, Rosenfeld R.
+\newblock A human judgment approach to epidemiological forecasting.
+\newblock PLOS Computational Biology. 2017;13(3):e1005248.
+
+\bibitem{wilidef}
+Overview of Influenza Surveillance in the United States; 2015.
+\newblock Available from: \url{http://www.cdc.gov/flu/weekly/overview.htm}.
+
+\bibitem{who_ili_def}
+WHO surveillance case definitions for ILI and SARI; 2014.
+\newblock Available from:
+  \url{http://www.who.int/influenza/surveillance_monitoring/ili_sari_surveillance_case_definition/en/}.
+
+\bibitem{ritzwoller2005comparison}
+Ritzwoller DP, Kleinman K, Palen T, Abrams A, Kaferly J, Yih W, et~al.
+\newblock Comparison of syndromic surveillance and a sentinel provider system
+  in detecting an influenza outbreak—Denver, Colorado, 2003.
+\newblock MMWR Morb Mortal Wkly Rep. 2005;54(Suppl.):151--6.
+
+\bibitem{thompson2006epidemiology}
+Thompson WW, Comanor L, Shay DK.
+\newblock Epidemiology of seasonal influenza: use of surveillance data and
+  statistical models to estimate the burden of disease.
+\newblock Journal of Infectious Diseases. 2006;194(Supplement 2):S82--S91.
+
+\bibitem{m2008infectious}
+M'ikanatha NM, Lynfield R, Van~Beneden CA, de~Valk H.
+\newblock Infectious disease surveillance.
+\newblock John Wiley \& Sons; 2008.
+
+\bibitem{bonabeau1998geographical}
+Bonabeau E, Toubiana L, Flahault A.
+\newblock The geographical spread of influenza.
+\newblock Proceedings of the Royal Society of London B: Biological Sciences.
+  1998;265(1413):2421--2425.
+
+\bibitem{viboud2006synchrony}
+Viboud C, Bj{\o}rnstad ON, Smith DL, Simonsen L, Miller MA, Grenfell BT.
+\newblock Synchrony, waves, and spatial hierarchies in the spread of influenza.
+\newblock science. 2006;312(5772):447--451.
+
+\bibitem{eggo2010spatial}
+Eggo RM, Cauchemez S, Ferguson NM.
+\newblock Spatial dynamics of the 1918 influenza pandemic in England, Wales and
+  the United States.
+\newblock Journal of The Royal Society Interface. 2010; p. rsif20100216.
+
+\bibitem{viboud2013contrasting}
+Viboud C, Nelson MI, Tan Y, Holmes EC.
+\newblock Contrasting the epidemiological and evolutionary dynamics of
+  influenza spatial transmission.
+\newblock Philosophical Transactions of the Royal Society of London B:
+  Biological Sciences. 2013;368(1614):20120199.
+
+\bibitem{gog2014spatial}
+Gog JR, Ballesteros S, Viboud C, Simonsen L, Bjornstad ON, Shaman J, et~al.
+\newblock Spatial transmission of 2009 pandemic influenza in the US.
+\newblock PLoS Comput Biol. 2014;10(6):e1003635.
 
 \bibitem{farrow2016modeling}
 Farrow DC.
