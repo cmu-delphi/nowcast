@@ -291,11 +291,21 @@ isolation. However, it was more recently demonstrated that multiple digital
 surveillance signals can be used in parallel to produce more accurate nowcasts
 of national wILI \cite{santillana2015combining}.
 
-TODO
+\subsection*{Contribution}
+
+We propose nowcasting influenza through \emph{sensor
+fusion}~\cite{farrow2016modeling} of digital surveillance. Derived from the
+Kalman filter \cite{kalman1960new}, sensor fusion is optimal in a least-squares
+sense (up to assumptions of independence and normality), robust to noise,
+tolerant of missing data, and capable of assimilating data across varying
+geospatial resolutions. We implement a sensor fusion framework and apply it to
+nowcasting ILI in US states and territories (and in any combination thereof,
+including HHS regions, census divisions, and the US as a whole), based on the
+assimilation of any and all surveillance data available at runtime.
 
 \section*{Materials and methods}
 
-TODO~\cite{farrow2016modeling}
+TODO
 
 % Results and Discussion can be combined.
 \section*{Results}
@@ -568,6 +578,11 @@ Farrow DC.
 \newblock Carnegie Mellon University; 2016.
 \newblock Available from:
   \url{http://reports-archive.adm.cs.cmu.edu/anon/cbd/CMU-CB-16-101.pdf}.
+
+\bibitem{kalman1960new}
+Kalman RE.
+\newblock A new approach to linear filtering and prediction problems.
+\newblock Journal of basic Engineering. 1960;82(1):35--45.
 
 \end{thebibliography}
 % Paste the contents of the *.bbl file above this line.
