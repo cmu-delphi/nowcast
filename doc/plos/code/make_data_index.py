@@ -14,7 +14,7 @@ def main():
     if os.path.isdir(item):
       item += '/'
     link = '<a href="%s">%s</a>' % (item, item)
-    print('<li>%s<br>%.2f MiB; Created %s</li>' % (link, size, when))
+    print('<li>%s<br>%.2f MiB</li>' % (link, size))
   print('</ul></html>')
 
 
