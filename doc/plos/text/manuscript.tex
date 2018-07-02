@@ -305,6 +305,86 @@ assimilation of any and all surveillance data available at runtime.
 
 \section*{Materials and methods}
 
+\subsection*{Data Sources}
+
+Data sources used in nowcasting can be broadly separated into two classes:
+ground truth and surveillance. The aim at any given point in time is to predict
+ground truth, given surveillance. Surveillance can be further divided into
+digital surveillance (e.g. based on social media) and predictive surveillance
+(e.g. based on short-term forecasts). Below are the specific data sources we
+use in each category.
+
+\subsubsection*{Ground Truth}
+
+\begin{description}
+  \item{\textbf{Population weighted percent Influenza-like Illness (wILI)}} \\
+    Each week, CDC publishes wILI for the US as a whole, the 10 HHS regions,
+    the 9 census divisions, and most states and territories \cite{wilisrc}. In
+    any given location, wILI is the mean (weighted by population) of ILI in
+    constituent locations. ILI is the percent of influenza-like illness out of
+    all patient visits voluntarily reported by participating healthcare
+    providers. Because reports continue to be integrated after initial
+    publication, wILI is subject to retrospective revision in a process we
+    refer to as ``backfill''. As a result, wILI is effectively versioned. When
+    training models and making predictions, we use preliminary---not
+    final---values of wILI whenever possible.
+\end{description}
+
+\subsubsection*{Digital Surveillance}
+
+\begin{description}
+  \item{\textbf{Google Flu Trends}} \\
+    Google Flu Trends was a weekly prediction of wILI based on Google searches.
+    The service was originally released in 2008; was updated in 2009, 2013, and
+    2014 \cite{ginsberg2009, gft_main}; and was discontinued in 2015.
+  \item{\textbf{Google Health Trends}} \\
+    Google Health Trends is an API by Google for research purposes which makes
+    available, among many other things, daily counts (on an arbitrary scale)
+    for a predefined influenza topic. TODO(link)
+  \item{\textbf{HealthTweets}} \\
+    HealthTweets (http://healthtweets.org) makes available the daily volume of
+    tweets indicative of ILI \cite{broniatowski2013national,
+    dredze2014healthtweets}.
+  \item{\textbf{Wikimedia Foundation}} \\
+    The Wikimedia Foundation makes available the number of hits, per hour, to
+    every Wikipedia article. TODO(link)
+  \item{\textbf{CDC Page Hits}} \\
+    CDC makes available the number of daily hits per page, per state for their
+    website (https:/www.cdc.gov/).
+\end{description}
+
+\subsubsection*{Predictive Surveillance}
+
+\begin{description}
+  \item{\textbf{Epicast (EPIC)}} \\
+    Epicast \cite{farrow2017human} is an influenza forecasting system based on
+    collective human judgment. From these forecasts, we interpret the
+    one-week-ahead value of wILI as a nowcast. TODO(link)
+  \item{\textbf{Seasonal Autoregression (SAR3)}} \\
+    SAR3 \cite{farrow2016modeling} provides an autoregression estimate of wILI
+    on the current week. TODO(link)
+  \item{\textbf{Epidemic Archetype (ARCH)}} \\
+    ARCH \cite{farrow2016modeling} is an empirical model based on the Empirical
+    Bayes forecasting framework \cite{brooks2015}. Like Epicast, ARCH provides
+    a short-term epidemiological forecast from which we interpret the
+    one-week-ahead prediction as a nowcast.
+\end{description}
+
+With the exception of Google Health Trends, these data sources are publicly
+available via the Delphi Epidata API. TODO(can we share TWTR? GHT?) TODO(link)
+
+\subsection*{Fitting}
+
+%As others have done for flu and other infectious diseases
+%\cite{generous2014global, hickmann2015forecasting, mciver2014wikipedia}, we use
+%the popularity of selected articles to estimate wILI for the US as a whole.
+%
+%As with WIKI, we use popularity of selected pages to estimate ILI within US
+%states.
+%
+%Inputs available at sub-weekly temporal resolution are aggregated to form
+%weekly readings.
+
 TODO
 
 % Results and Discussion can be combined.
@@ -583,6 +663,21 @@ Farrow DC.
 Kalman RE.
 \newblock A new approach to linear filtering and prediction problems.
 \newblock Journal of basic Engineering. 1960;82(1):35--45.
+
+\bibitem{wilisrc}
+Influenza National and Regional Level Graphs and Data; 2017.
+\newblock Available from:
+  \url{https://gis.cdc.gov/grasp/fluview/fluportaldashboard.html}.
+
+\bibitem{gft_main}
+Google Flu Trends; 2015.
+\newblock Available from: \url{https://www.google.org/flutrends/about/}.
+
+\bibitem{dredze2014healthtweets}
+Dredze M, Cheng R, Paul MJ, Broniatowski D.
+\newblock HealthTweets.org: a platform for public health surveillance using
+  twitter.
+\newblock In: AAAI Conference on Artificial Intelligence; 2014. p. 1--2.
 
 \end{thebibliography}
 % Paste the contents of the *.bbl file above this line.
