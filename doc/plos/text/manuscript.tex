@@ -414,6 +414,58 @@ CDCP), we aggregate counts by week before applying the fitting procedure. In
 future work we aim to incorporate these sources as soon as they are available,
 rather than waiting until the end of the week to use their aggregate values.
 
+\subsection*{Fusion}
+
+The fitting procedure described above gives a disparate set of predictions of
+wILI for various locations in the US. We combine---via sensor fusion
+\cite{farrow2016modeling}---all available predictions into a single, unified
+nowcast of wILI throughout the US.
+
+Sensor fusion is a generalization of the Kalman filter \cite{kalman1960new}
+which relaxes assumptions regarding the process being tracked---the
+distribution of wILI in this case. In particular, sensor fusion describes the
+combination of a set of measurements without requiring a linear Markov process
+model. This combination is optimal in a least-squares sense when the
+measurements are unbiased with normally distributed error.
+
+For nowcasting flu, this means practically that the fusion inputs should be in
+the same units and on the same scale as wILI and should have normally
+distributed error. By applying the fitting procedure above, we meet the first
+requirement, and the assumption that errors are normally distributed is
+generally not grossly violated.
+
+Nowcasting is conceptually a two-step process. First, measurements are fused to
+give an estimate of latent system state (namely, wILI in US states and
+territories). Second, nowcasts for each location of interest (namely, wILI in
+the US as a whole, HHS regions, census divisions, states, and territories) are
+extracted as a linear combination of latent state wILI.
+
+More concretely, given a vector of ``sensor`` readings (surveillance values as
+described above) $z$, we apply the sensor fusion kernel to produce a vector
+nowcast $y$.
+
+\begin{align*}
+A &= (H^T R^{-1} H)^{-1} H^T R^{-1} \\
+x &= A z \\
+y &= W x
+\end{align*}
+
+Elements of $z$ are the sensor reading of a particular data source in a
+particular location, and elements of $y$ are a unified nowcast in each location
+of interest.
+
+Matrices $H$ and $W$ are mappings from latent state-space to measurement-space
+and output-space respectively. Matrix $R$ is the empirical covariance of sensor
+noise, where noise is defined as the difference between sensor readings and
+ground truth measured on historical data. Intermediate matrix $A$ conceptually
+represents the optimal translation from measurement-space to latent
+state-space, given the reverse mapping ($H$) and sensor noise covariance ($R$).
+
+$H$ and $W$ are defined by the geographical makeup and population distribution
+within the US; they are constants, modulo changes in population over long
+periods of time (e.g. years). On any given week, sensors $z$ are given by
+surveillance data, and covariance $R$ is estimated based on historical data.
+
 % Results and Discussion can be combined.
 \section*{Results}
 
