@@ -333,22 +333,22 @@ use in each category.
 \subsubsection*{Digital Surveillance}
 
 \begin{description}
-  \item{\textbf{Google Flu Trends}} \\
+  \item{\textbf{Google Flu Trends (GFT)}} \\
     Google Flu Trends was a weekly prediction of wILI based on Google searches.
     The service was originally released in 2008; was updated in 2009, 2013, and
     2014 \cite{ginsberg2009, gft_main}; and was discontinued in 2015.
-  \item{\textbf{Google Health Trends}} \\
+  \item{\textbf{Google Health Trends (GHT)}} \\
     Google Health Trends is an API by Google for research purposes which makes
     available, among many other things, daily counts (on an arbitrary scale)
     for a predefined influenza topic. TODO(link)
-  \item{\textbf{HealthTweets}} \\
+  \item{\textbf{HealthTweets (TWTR)}} \\
     HealthTweets (http://healthtweets.org) makes available the daily volume of
     tweets indicative of ILI \cite{broniatowski2013national,
     dredze2014healthtweets}.
-  \item{\textbf{Wikimedia Foundation}} \\
+  \item{\textbf{Wikimedia Foundation (WIKI)}} \\
     The Wikimedia Foundation makes available the number of hits, per hour, to
     every Wikipedia article. TODO(link)
-  \item{\textbf{CDC Page Hits}} \\
+  \item{\textbf{CDC Page Hits (CDCP)}} \\
     CDC makes available the number of daily hits per page, per state for their
     website (https:/www.cdc.gov/).
 \end{description}
@@ -375,17 +375,44 @@ available via the Delphi Epidata API. TODO(can we share TWTR? GHT?) TODO(link)
 
 \subsection*{Fitting}
 
-%As others have done for flu and other infectious diseases
-%\cite{generous2014global, hickmann2015forecasting, mciver2014wikipedia}, we use
-%the popularity of selected articles to estimate wILI for the US as a whole.
-%
-%As with WIKI, we use popularity of selected pages to estimate ILI within US
-%states.
-%
-%Inputs available at sub-weekly temporal resolution are aggregated to form
-%weekly readings.
+To obtain a signal usable for nowcasting, we must fit inputs to wILI. Since
+this is trivially the case for predictive surveillance (i.e. EPIC, SAR3, and
+ARCH), we use those values directly. For digital survaillance, we use
+historical data to build a linear regression model mapping raw inputs to wILI.
+We then apply this model with the most recent data to obtain a prediction of
+wILI. We repeat the fitting procedure each week prior to nowcasting to obtain a
+new model based on the most up-to-date data. The fitting procedure is described
+in more detail in \cite{farrow2016modeling}.
 
-TODO
+Data sources with a single covariate (i.e. GFT, GHT, TWTR) are fit with
+ordinary linear regression. Data sources with multiple covariates (i.e. WIKI,
+CDCP) are fit with multiple linear regression.
+
+As others have done for flu and other infectious diseases
+\cite{generous2014global, hickmann2015forecasting, mciver2014wikipedia}, we use
+the volume of Wikipedia traffic to estimate wILI for the US as a whole. To
+produce a signal, we fit seven covariates to wILI, each corresponding to a
+particular flu-releated Wikipedia article. The articles TODO(list in SI) were
+chosen offline and by hand \textit{a priori}. Since WIKI has no attached
+location information, we filter by particular hours of the day TODO(list in SI)
+as a very rough proxy of Wikipedia activity in the US. Although this is a
+grossly invalid assumption, preliminary investigation showed this to provide a
+better fit to wILI.
+
+Similarly, CDCP consists of six covariates, each corresponding to a particular
+flu-releated page on the CDC website. The pages TODO(list in SI) were chosen
+offline and by hand \textit{a priori}. CDCP is unique in that the covariates
+are log-transformed before fitting as preliminary investigation showed this to
+provide a better fit to wILI.
+
+For all digital surveillance sources, we apply the fitting procedure separately
+for each available location (e.g. US as a whole, HHS regions, census divisions,
+and US states).
+
+For data sources with sub-weekly temporal resolution (i.e. GHT, TWTR, WIKI,
+CDCP), we aggregate counts by week before applying the fitting procedure. In
+future work we aim to incorporate these sources as soon as they are available,
+rather than waiting until the end of the week to use their aggregate values.
 
 % Results and Discussion can be combined.
 \section*{Results}
