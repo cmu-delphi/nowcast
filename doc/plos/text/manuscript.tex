@@ -466,6 +466,29 @@ within the US; they are constants, modulo changes in population over long
 periods of time (e.g. years). On any given week, sensors $z$ are given by
 surveillance data, and covariance $R$ is estimated based on historical data.
 
+\subsection*{Covariance}
+
+Given that multiple surveillance sources provide data at the level of US
+states, the total number of source-location pairs (``sensors'') is well into
+the hundreds. Their resulting covariance is very high-dimensional, especially
+relative to the amount of weekly historical training data that is typically
+available (e.g. a couple of years). Further, some data sources are only
+available seasonally (i.e. EPIC, ARCH), and some are relatively lacking in
+training data (i.e. CDCP, EPIC). In general, partial and missing data is a
+possibility for any data source.
+
+Estimating covariance in this situation is challenging, and while the
+statistical literature suggests several approaches TODO(cite a few of them),
+consensus appears to be lacking.
+
+We begin by computing the empirical pair-wise covariance of all sensors.
+However, the resulting matrix does not necessarily describe multi-dimensional
+covariance (i.e. it may not be positive definite). To correct this, we shrink
+this matrix toward the diagonal matrix of sensor variance. The magnitude of the
+shrinkage weight is chosen to maximize the multivariate normal log-likelihood
+of the available data. We subsequently use the shrunken matrix as $R$ in sensor
+fusion.
+
 % Results and Discussion can be combined.
 \section*{Results}
 
