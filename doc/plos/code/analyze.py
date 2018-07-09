@@ -100,7 +100,7 @@ class Analysis:
 def main():
   analysis = Analysis()
   plotter = UglyPlot(analysis)
-  ploter.plot_sensor_heatmap()
+  plotter.plot_sensor_heatmap()
 
 
 if __name__ == '__main__':
