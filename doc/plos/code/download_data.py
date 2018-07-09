@@ -27,6 +27,16 @@ def download_fluview(f):
       f.write('%d,%s,%.5f\n' % (week, loc, value))
 
 
+def download_preliminary_fluview(f):
+  for lag in range(3):
+    print('preliminary fluview', lag)
+    resp = Epidata.fluview('nat', weeks, lag=lag, auth=secrets.api.fluview)
+    rows = Epidata.check(resp)
+    for row in rows:
+      week, value = row['epiweek'], row['wili']
+      f.write('%d,%s,%.5f\n' % (week, 'nat_%d' % lag, value))
+
+
 def download_sensors(f):
   for sensor in FluDataSource.SENSORS:
     for loc in Locations.region_list:
@@ -46,6 +56,8 @@ def main():
   print('downloading... this may take a while (1m1.219s to be exact)')
   with open('fluview.csv', 'w') as f:
     download_fluview(f)
+  with open('fluview_prelim.csv', 'w') as f:
+    download_preliminary_fluview(f)
   with open('sensors.csv', 'w') as f:
     download_sensors(f)
 
