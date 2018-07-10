@@ -113,6 +113,7 @@ def main():
   analysis = Analysis()
   plotter = UglyPlot(analysis)
   plotter.plot_sensor_heatmap()
+  plotter.plot_all_nowcasts()
 
 
 if __name__ == '__main__':
