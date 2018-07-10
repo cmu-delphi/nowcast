@@ -22,7 +22,7 @@ class UglyPlot:
     ax.set_xticklabels(['%d' % weeks[i] for i in wk_idx])
     ax.set_yticklabels(sensors[::-1])
     plt.pcolor(data[::-1, :])
-    self._save('sensor_heatmap_top')
+    self._save('sensor_heatmap_bottom')
 
     for i, sensor in enumerate(sensors):
       plt.plot(data[i, :], label=sensor)
@@ -30,4 +30,4 @@ class UglyPlot:
     plt.plot([t[w] for w in weeks], label='Ground Truth', color='black')
     plt.ylim([0, 10])
     plt.legend()
-    self._save('sensor_heatmap_bottom')
+    self._save('sensor_heatmap_top')
