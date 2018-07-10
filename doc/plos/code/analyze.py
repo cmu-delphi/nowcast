@@ -60,6 +60,18 @@ class Analysis:
     result = {}
     for week, place, value, std in self.data['nc_%s' % name]:
       if place == loc:
+        if (loc == 'vi' and week < 201327) or (loc == 'pr' and week < 201453):
+          # The nowcast for this location on this week was made *without* any
+          # sensors for this location on this week. It's only available by
+          # inference indirectly from sensors in other locations in the same
+          # region. That these nowcasts were possible at all is a testament to
+          # the flexibility of sensor fusion, but they are not interesting from
+          # the perspective of comparing nowcast accuracy to sensor accuracy --
+          # there are no sensors with which to compare. Full disclosure, these
+          # nowcasts are much less accurate than nowcasts for which direct
+          # sensors are available, and this is reflected by their associated
+          # standard deviations on these weeks.
+          continue
         result[week] = value
     return result
 
