@@ -115,6 +115,7 @@ def main():
   plotter.plot_sensor_heatmap()
   plotter.plot_all_nowcasts()
   plotter.plot_accuracy_vs_sensors()
+  plotter.plot_accuracy_vs_ablation()
 
 
 if __name__ == '__main__':

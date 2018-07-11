@@ -94,3 +94,33 @@ class UglyPlot:
       axes[r, c].text(.4, 3.5, '%s (%d)' % (sensor, st_n['n']))
 
     self._save('accuracy_vs_sensors')
+
+  def plot_accuracy_vs_ablation(self):
+    fig, axes = plt.subplots(nrows=4, ncols=2, figsize=(6, 8))
+
+    loc = 'nat'
+    for i, sensor in enumerate(FluDataSource.SENSORS):
+      t = self.analysis.get_truth(loc)
+      n = self.analysis.get_nowcast(loc)
+      s = self.analysis.get_experiment('ablate_%s' % sensor, loc)
+      ns = self.analysis.merge(n, s)
+      t = dict((w, t[w]) for w in ns.keys())
+      n = dict((w, n[w]) for w in ns.keys())
+      s = dict((w, s[w]) for w in ns.keys())
+      ts = self.analysis.merge(t, s)
+      tn = self.analysis.merge(t, n)
+
+      st_s = self.analysis.get_stats(ts)
+      st_n = self.analysis.get_stats(tn)
+      if st_s['n'] != st_n['n']:
+        raise Exception()
+
+      r = i // 2
+      c = i % 2
+      x = [3, 4, 0, 1]
+      y = [st_s['mae'], st_n['mae'], st_s['rmse'], st_n['rmse']]
+      axes[r, c].barh(x, y, tick_label=['-', '+', '-', '+'])
+      axes[r, c].set_xlim([0, 0.3])
+      axes[r, c].text(.2, 3.5, '%s (%d)' % (sensor, st_n['n']))
+
+    self._save('accuracy_vs_ablation')
