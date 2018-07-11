@@ -116,6 +116,7 @@ def main():
   plotter.plot_all_nowcasts()
   plotter.plot_accuracy_vs_sensors()
   plotter.plot_accuracy_vs_ablation()
+  plotter.plot_accuracy_vs_abscission()
 
 
 if __name__ == '__main__':

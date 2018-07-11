@@ -124,3 +124,37 @@ class UglyPlot:
       axes[r, c].text(.2, 3.5, '%s (%d)' % (sensor, st_n['n']))
 
     self._save('accuracy_vs_ablation')
+
+  def plot_accuracy_vs_abscission(self):
+    fig, ax = plt.subplots(figsize=(3, 3))
+
+    loc = 'nat'
+    tru = self.analysis.get_truth(loc)
+    a_n = self.analysis.get_experiment('abscise2_national', loc)
+    a_r = self.analysis.get_experiment('abscise2_regional', loc)
+    a_s = self.analysis.get_experiment('abscise2_state', loc)
+
+    tvn = self.analysis.merge(tru, a_n)
+    tvr = self.analysis.merge(tru, a_r)
+    tvs = self.analysis.merge(tru, a_s)
+
+    st_n = self.analysis.get_stats(tvn)
+    st_r = self.analysis.get_stats(tvr)
+    st_s = self.analysis.get_stats(tvs)
+    if st_n['n'] != st_r['n'] or st_n['n'] != st_s['n']:
+      raise Exception()
+
+    x = [6, 5, 4, 2, 1, 0]
+    y = [
+      st_n['mae'],
+      st_r['mae'],
+      st_s['mae'],
+      st_n['rmse'],
+      st_r['rmse'],
+      st_s['rmse'],
+    ]
+    ax.barh(x, y, tick_label=['Nm', 'Rm', 'Sm', 'Nr', 'Rr', 'Sr'])
+    ax.set_xlim([0, 0.3])
+    ax.text(.25, 5, '(%d)' % (st_n['n']))
+
+    self._save('accuracy_vs_abscission')
