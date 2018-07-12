@@ -169,6 +169,9 @@
 \newcommand{\lorem}{{\bf LOREM}}
 \newcommand{\ipsum}{{\bf IPSUM}}
 
+% TODO: don't include graphics in the final version
+\newcommand{\maybeincludegraphics}[1]{\includegraphics[width=\textwidth]{../data/figures/#1.png}}
+
 %% END MACROS SECTION
 
 
@@ -497,7 +500,105 @@ data. We subsequently use the shrunken matrix as $R$ in sensor fusion.
 % Results and Discussion can be combined.
 \section*{Results}
 
-TODO
+\subsection*{Sensors}
+
+% python3 analyze.py sensor_info
+% gft:
+%   num national: 254
+%   first week: 201040
+%   last week: 201532
+%   num locations: 62
+% ght:
+%   num national: 402
+%   first week: 201040
+%   last week: 201824
+%   num locations: 52
+% twtr:
+%   num national: 339
+%   first week: 201151
+%   last week: 201824
+%   num locations: 71
+% wiki:
+%   num national: 402
+%   first week: 201040
+%   last week: 201824
+%   num locations: 1
+% cdc:
+%   num national: 276
+%   first week: 201310
+%   last week: 201824
+%   num locations: 71
+% epic:
+%   num national: 119
+%   first week: 201442
+%   last week: 201819
+%   num locations: 15
+% sar3:
+%   num national: 402
+%   first week: 201040
+%   last week: 201824
+%   num locations: 75
+% arch:
+%   num national: 265
+%   first week: 201040
+%   last week: 201820
+%   num locations: 20
+% total num readings: 113164
+
+In total, we obtained 113,164 individual sensor readings from the eight
+surveillance sources discussed above. Table~\ref{table_sensor_breakdown} gives
+a breakdown of the number of weeks and locations covered by each source.
+Fig~\ref{figure_sensor_heatmap} shows time-series of sensor readings for the US
+as a whole, which is the only location common to all data sources.
+
+\begin{table}[!ht]
+  \centering
+  \caption{{\bf TODO(Table caption.)}}
+  \begin{tabular}{|l|l|l|}
+    \hline
+    {\bf Source} & {\bf Weeks} & {\bf Locations}\\ \thickhline
+    GFT & 254 & 62 \\ \hline
+    GHT & 402 & 52 \\ \hline
+    TWTR & 339 & 71 \\ \hline
+    WIKI & 402 & 1 \\ \hline
+    CDCP & 276 & 71 \\ \hline
+    EPIC & 119 & 15 \\ \hline
+    SAR3 & 402 & 75 \\ \hline
+    ARCH & 265 & 20 \\ \hline
+  \end{tabular}
+  \begin{flushleft}
+    TODO(Table notes.)
+  \end{flushleft}
+  \label{table_sensor_breakdown}
+\end{table}
+
+\begin{figure}[!h]
+  \maybeincludegraphics{sensor_heatmap_top}
+  \maybeincludegraphics{sensor_heatmap_bottom}
+  \caption{
+    {\bf TODO(figure title.)}
+    TODO(Figure caption top and bottom.)
+  }
+  \label{figure_sensor_heatmap}
+\end{figure}
+
+\subsection*{Nowcasts}
+
+% python3 analyze.py nowcast_info
+% num national nowcasts: 397
+% first week: 201045
+% last week: 201824
+% total num nowcasts: 29103
+% num locations: 75
+
+In total, we produced 29,103 nowcasts for 75 US locations across 397 weeks
+spanning 2010w45--2018w24. Locations include the US as a whole, the 10 HHS
+regions, the 9 census divisions, the 50 states, the District of Columbia,
+Puerto Rico, the US Virgin Islands, New York City, and New York state
+\textit{excluding} New York City. Although these were computed in retrospect,
+models were trained using only data that would have been available at the time.
+Namely, whenever possible, preliminary values of wILI were used in place of
+final values.
 
 \section*{Discussion}
 
@@ -833,32 +934,5 @@ Touloumis A.
 
 \end{thebibliography}
 % Paste the contents of the *.bbl file above this line.
-
-% Don't include figures in the final version. This is just for preview.
-\newgeometry{top=1.0in,left=1.0in,footskip=30pt}
-\begin{figure}[p]
-  \includegraphics[width=\textwidth]{../data/figures/sensor_heatmap_top.png}
-  Figure 1 (top).
-\end{figure}
-\begin{figure}[p]
-  \includegraphics[width=\textwidth]{../data/figures/sensor_heatmap_bottom.png}
-  Figure 1 (bottom).
-\end{figure}
-\begin{figure}[p]
-  \includegraphics[width=\textwidth]{../data/figures/all_nowcasts.png}
-  Figure 2.
-\end{figure}
-\begin{figure}[p]
-  \includegraphics[width=\textwidth]{../data/figures/accuracy_vs_sensors.png}
-  Figure 3.
-\end{figure}
-\begin{figure}[p]
-  \includegraphics[width=\textwidth]{../data/figures/accuracy_vs_ablation.png}
-  Figure 4.
-\end{figure}
-\begin{figure}[p]
-  \includegraphics[width=\textwidth]{../data/figures/accuracy_vs_abscission.png}
-  Figure 5.
-\end{figure}
 
 \end{document}
