@@ -477,17 +477,22 @@ available seasonally (i.e. EPIC, ARCH), and some are relatively lacking in
 training data (i.e. CDCP, EPIC). In general, partial and missing data is a
 possibility for any data source.
 
-Estimating covariance in this situation is challenging, and while the
-statistical literature suggests several approaches TODO(cite a few of them),
-consensus appears to be lacking.
+Estimating covariance in this situation is challenging, and the statistical
+literature suggests several approaches \cite{bickel2008covariance,
+ollerer2015robust, bien2011sparse, friedman2008sparse, bickel2008regularized,
+hsieh2011sparse}. For speed and simplicity, we follow the guidance of
+\cite{kolar2012consistent} for handling missing values and of
+\cite{touloumis2015nonparametric} for regularization.
 
-We begin by computing the empirical pair-wise covariance of all sensors.
-However, the resulting matrix does not necessarily describe multi-dimensional
-covariance (i.e. it may not be positive definite). To correct this, we shrink
-this matrix toward the diagonal matrix of sensor variance. The magnitude of the
-shrinkage weight is chosen to maximize the multivariate normal log-likelihood
-of the available data. We subsequently use the shrunken matrix as $R$ in sensor
-fusion.
+We begin by building a matrix of pair-wise empirical covariance. In this
+matrix, the value of each element is computed as the covariance between a pair
+of sensors. By filling the matrix, covariance is computed independently for all
+sensor pairs. However, the resulting matrix does not necessarily describe
+multi-dimensional covariance (i.e. it may not be positive definite), especially
+with many missing values. To handle this, we shrink this matrix toward the
+diagonal matrix of sensor variance. The magnitude of the shrinkage weight is
+chosen to maximize the multivariate normal log-likelihood of the available
+data. We subsequently use the shrunken matrix as $R$ in sensor fusion.
 
 % Results and Discussion can be combined.
 \section*{Results}
@@ -780,6 +785,51 @@ Dredze M, Cheng R, Paul MJ, Broniatowski D.
 \newblock HealthTweets.org: a platform for public health surveillance using
   twitter.
 \newblock In: AAAI Conference on Artificial Intelligence; 2014. p. 1--2.
+
+\bibitem{bickel2008covariance}
+Bickel PJ, Levina E.
+\newblock Covariance regularization by thresholding.
+\newblock The Annals of Statistics. 2008; p. 2577--2604.
+
+\bibitem{ollerer2015robust}
+{\"O}llerer V, Croux C.
+\newblock Robust high-dimensional precision matrix estimation.
+\newblock In: Modern Nonparametric, Robust and Multivariate Methods. Springer;
+  2015. p. 325--350.
+
+\bibitem{bien2011sparse}
+Bien J, Tibshirani RJ.
+\newblock Sparse estimation of a covariance matrix.
+\newblock Biometrika. 2011;98(4):807--820.
+
+\bibitem{friedman2008sparse}
+Friedman J, Hastie T, Tibshirani R.
+\newblock Sparse inverse covariance estimation with the graphical lasso.
+\newblock Biostatistics. 2008;9(3):432--441.
+
+\bibitem{bickel2008regularized}
+Bickel PJ, Levina E.
+\newblock Regularized estimation of large covariance matrices.
+\newblock The Annals of Statistics. 2008; p. 199--227.
+
+\bibitem{hsieh2011sparse}
+Hsieh CJ, Dhillon IS, Ravikumar PK, Sustik MA.
+\newblock Sparse inverse covariance matrix estimation using quadratic
+  approximation.
+\newblock In: Advances in Neural Information Processing Systems; 2011. p.
+  2330--2338.
+
+\bibitem{kolar2012consistent}
+Kolar M, Xing EP.
+\newblock Consistent covariance selection from data with missing values.
+\newblock In: Proceedings of the 29th International Conference on Machine
+  Learning (ICML-12); 2012. p. 551--558.
+
+\bibitem{touloumis2015nonparametric}
+Touloumis A.
+\newblock Nonparametric Stein-type shrinkage covariance matrix estimators in
+  high-dimensional settings.
+\newblock Computational Statistics \& Data Analysis. 2015;83:251--261.
 
 \end{thebibliography}
 % Paste the contents of the *.bbl file above this line.
