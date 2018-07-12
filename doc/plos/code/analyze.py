@@ -1,3 +1,4 @@
+import argparse
 import csv
 import glob
 import os
@@ -110,13 +111,50 @@ class Analysis:
 
 
 def main():
+  parser = argparse.ArgumentParser()
+  parser.add_argument(
+      'name',
+      help='name of the analysis to run')
+  args = parser.parse_args()
+  name = args.name
+
   analysis = Analysis()
-  plotter = UglyPlot(analysis)
-  plotter.plot_sensor_heatmap()
-  plotter.plot_all_nowcasts()
-  plotter.plot_accuracy_vs_sensors()
-  plotter.plot_accuracy_vs_ablation()
-  plotter.plot_accuracy_vs_abscission()
+
+  if name == 'nowcast_info':
+    n = analysis.get_nowcast('nat')
+    print('num national nowcasts: %d' % len(n))
+    print('first week: %d' % min(n))
+    print('last week: %d' % max(n))
+    t = 0
+    for l in Locations.region_list:
+      t += len(analysis.get_nowcast(l))
+    print('total num nowcasts: %d' % t)
+    print('num locations: %d' % len(Locations.region_list))
+  elif name == 'sensor_info':
+    grand_total = 0
+    for s in FluDataSource.SENSORS:
+      print('%s:' % s)
+      n = analysis.get_sensor(s, 'nat')
+      print('  num national: %d' % len(n))
+      print('  first week: %d' % min(n))
+      print('  last week: %d' % max(n))
+      num_loc = 0
+      for l in Locations.region_list:
+        n = len(analysis.get_sensor(s, l))
+        if n:
+          num_loc += 1
+        grand_total += n
+      print('  num locations: %d' % num_loc)
+    print('total num readings: %d' % grand_total)
+  elif name == 'plot':
+    plotter = UglyPlot(analysis)
+    plotter.plot_sensor_heatmap()
+    plotter.plot_all_nowcasts()
+    plotter.plot_accuracy_vs_sensors()
+    plotter.plot_accuracy_vs_ablation()
+    plotter.plot_accuracy_vs_abscission()
+  else:
+    raise Exception('unknown analysis: %s' % name)
 
 
 if __name__ == '__main__':
