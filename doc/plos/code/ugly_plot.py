@@ -20,23 +20,25 @@ class UglyPlot:
   def plot_sensor_heatmap(self):
     data, sensors, weeks = self.analysis.get_heatmap_data()
 
-    fig, ax = plt.subplots(figsize=(6, 3))
+    fig, axes = plt.subplots(nrows=2, ncols=1, figsize=(6, 6))
+
+    ax = axes[1]
     wk_idx = list(range(0, len(weeks), 100))
-    plt.xticks(wk_idx)
-    plt.yticks([0.5 + i for i in range(len(sensors))])
+    ax.set_xticks(wk_idx)
+    ax.set_yticks([0.5 + i for i in range(len(sensors))])
     ax.set_xticklabels(['%d' % weeks[i] for i in wk_idx])
     ax.set_yticklabels(sensors[::-1])
-    plt.pcolor(data[::-1, :])
-    self._save('sensor_heatmap_bottom')
+    ax.pcolor(data[::-1, :])
 
-    plt.figure(figsize=(6, 3))
+    ax = axes[0]
     for i, sensor in enumerate(sensors):
-      plt.plot(data[i, :], label=sensor)
+      ax.plot(data[i, :], label=sensor)
     t = self.analysis.get_truth('nat')
-    plt.plot([t[w] for w in weeks], label='Ground Truth', color='black')
-    plt.ylim([0, 10])
-    plt.legend()
-    self._save('sensor_heatmap_top')
+    ax.plot([t[w] for w in weeks], label='Ground Truth', color='black')
+    ax.set_ylim([0, 10])
+    ax.legend()
+
+    self._save('sensor_heatmap')
 
   def plot_all_nowcasts(self):
 
