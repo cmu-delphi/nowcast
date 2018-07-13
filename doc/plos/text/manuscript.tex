@@ -569,12 +569,12 @@ as a whole, which is the only location common to all data sources.
   \label{table_sensor_breakdown}
 \end{table}
 
-\begin{figure}[!h]
+\begin{figure}[!ht]
   \maybeincludegraphics{sensor_heatmap}
   \caption{
     {\bf National sensor readings fitted from eight data sources.}
-    Top: Plot of sensor readings and ground truth wILI (black) over time,
-    highlighting sensor noise.
+    Top: Plot of sensor readings (colors) and ground truth wILI (black) over
+    time, highlighting sensor noise.
     Bottom: Heatmap of sensor readings over time, highlighting sensor
     intermittency.
   }
@@ -594,10 +594,22 @@ In total, we produced 29,103 nowcasts for 75 US locations across 397 weeks
 spanning 2010w45--2018w24. Locations include the US as a whole, the 10 HHS
 regions, the 9 census divisions, the 50 states, the District of Columbia,
 Puerto Rico, the US Virgin Islands, New York City, and New York state
-\textit{excluding} New York City. Although these were computed in retrospect,
-models were trained using only data that would have been available at the time.
-Namely, whenever possible, preliminary values of wILI were used in place of
-final values.
+\textit{excluding} New York City. Fig~\ref{figure_all_nowcasts} shows a
+time-series comparison of all nowcasts with ground truth. Although these
+nowcasts were computed in retrospect, models were trained using only data that
+would have been available at the time. Namely, whenever possible, preliminary
+values of wILI were used in place of final values.
+
+\begin{figure}[!ht]
+  \maybeincludegraphics{all_nowcasts}
+  \caption{
+    {\bf Nowcasts compared with ground truth.}
+    Each subpanel contains a plot of nowcast (color) and ground truth (black)
+    in a particular location within the US. All subplots share the same scale
+    in both time and magnitude.
+  }
+  \label{figure_all_nowcasts}
+\end{figure}
 
 \section*{Discussion}
 
