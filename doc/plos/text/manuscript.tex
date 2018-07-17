@@ -499,8 +499,8 @@ data. We subsequently use the shrunken matrix as $R$ in sensor fusion.
 
 \subsection*{Evaluation}
 
-In a given location over a given period of time, we assess the accuracy of a
-set of nowcasts by two measures: mean absolute error (MAE) and root mean
+In a given location over a given period of time, we assess the standalone
+accuracy of a nowcast by two measures: mean absolute error (MAE) root mean
 squared error (RMSE). With ground truth vector $\vec{x}$, nowcast vector
 $\vec{y}$, and elements indexed by week $w$ of $n$, these measures are defined
 as:
@@ -508,6 +508,20 @@ as:
 \begin{align*}
   \text{MAE} &= \frac{1}{n} \sum_{w=1}^n{\left|x_w - y_w\right|} \\
   \text{RMSE} &= \left( \frac{1}{n} \sum_{w=1}^n{\left(x_w - y_w\right)^2} \right)^\frac{1}{2}
+\end{align*}
+
+Although the units of ground truth (i.e. wILI) are the same in all locations,
+the normal range of wILI varies between locations. To facilitate comparison
+between locations, we also report mean absolute scaled error (MASE)
+\cite{hyndman2006another}. MASE is the MAE of a given nowcast normalized by the
+MAE of a naive nowcast in the same location. We define the naive nowcast for
+any given location on any given week as the reported ground truth in the same
+location 52 weeks earlier. Using the same notation as above, and considering
+the $m$ weeks for which ground truth is available for at least 52 weeks prior,
+MASE is defined as:
+
+\begin{align*}
+  \text{MASE} &= \text{MAE} \left( \frac{1}{m} \sum_{w=1}^m{\left|x_w - x_{w - 52}\right|} \right) ^ {-1}
 \end{align*}
 
 % Results and Discussion can be combined.
@@ -955,6 +969,11 @@ Touloumis A.
 \newblock Nonparametric Stein-type shrinkage covariance matrix estimators in
   high-dimensional settings.
 \newblock Computational Statistics \& Data Analysis. 2015;83:251--261.
+
+\bibitem{hyndman2006another}
+Hyndman RJ, Koehler AB.
+\newblock Another look at measures of forecast accuracy.
+\newblock International journal of forecasting. 2006;22(4):679--688.
 
 \end{thebibliography}
 % Paste the contents of the *.bbl file above this line.

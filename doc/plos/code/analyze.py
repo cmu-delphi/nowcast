@@ -83,12 +83,24 @@ class Analysis:
     return dict((ew, (a[ew], b[ew])) for ew in a.keys() & b.keys())
 
   def get_stats(self, merged):
-    a = np.array([merged[ew][0] for ew in merged])
-    b = np.array([merged[ew][1] for ew in merged])
+    a = np.array([merged[ew][0] for ew in sorted(merged)])
+    b = np.array([merged[ew][1] for ew in sorted(merged)])
+    mae = np.mean(np.abs(a - b))
+
+    # normalize MAE by MAE of naive nowcaster
+    naive = []
+    for ew1 in merged:
+      ew0 = Epiweek.add_epiweeks(ew1, -52)
+      if ew0 in merged:
+        naive.append(np.abs(merged[ew1][0] - merged[ew0][0]))
+    mae_naive = np.mean(naive)
+
     return {
       'n': len(merged),
       'rmse': np.sqrt(np.mean(np.square(a - b))),
-      'mae': np.mean(np.abs(a - b)),
+      'mae': mae,
+      'mae_naive': mae_naive,
+      'mase': mae / mae_naive,
     }
 
   def get_heatmap_data(self):
