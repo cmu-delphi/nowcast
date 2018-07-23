@@ -165,6 +165,7 @@ def main():
     plotter.plot_accuracy_vs_sensors()
     plotter.plot_accuracy_vs_ablation()
     plotter.plot_accuracy_vs_abscission()
+    plotter.plot_all_mase()
   else:
     raise Exception('unknown analysis: %s' % name)
 

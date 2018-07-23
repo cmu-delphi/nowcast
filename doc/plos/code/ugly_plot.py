@@ -16,6 +16,7 @@ class UglyPlot:
   def _save(self, name):
     plt.savefig('data/figures/' + name + '.png', bbox_inches='tight')
     plt.close()
+    print('>', name)
 
   def plot_sensor_heatmap(self):
     data, sensors, weeks = self.analysis.get_heatmap_data()
@@ -160,3 +161,32 @@ class UglyPlot:
     ax.text(.25, 5, '(%d)' % (st_n['n']))
 
     self._save('accuracy_vs_abscission')
+
+  def plot_all_mase(self):
+    fig, ax = plt.subplots(figsize=(6, 3))
+    nums = []
+    colors = []
+    for i, loc in enumerate(Locations.region_list):
+      idx = i % 2
+      idx += 2 if loc in Locations.hhs_list else 0
+      idx += 4 if loc in Locations.cen_list else 0
+      idx += 6 if loc in Locations.atom_list else 0
+      colors.append([
+        '#404040',
+        '#808080',
+        '#804040',
+        '#e08080',
+        '#408040',
+        '#80e080',
+        '#404080',
+        '#8080e0'][idx])
+      ft = self.analysis.get_truth(loc)
+      nc = self.analysis.get_nowcast(loc)
+      merged = self.analysis.merge(ft, nc)
+      st = self.analysis.get_stats(merged)
+      nums.append(st['mase'])
+    idx = list(range(len(nums)))
+    plt.bar(idx, nums, color=colors)
+    ax.tick_params(axis='x', labelsize=5)
+    plt.xticks(idx, Locations.region_list, rotation='vertical')
+    self._save('all_mase')
