@@ -80,15 +80,38 @@ class Analysis:
     return self.get_experiment('vanilla', loc)
 
   def get_naive_nowcast(self, loc):
+    # Because final wILI is not known for multiple months, it's not possible to
+    # implement a *real-time* random walk naive nowcaster. There are (at least)
+    # two ways to define a substitute naive nowcaster:
+    #   - Naive Oracle: assume final wILI is known at runtime (it's not)
+    #     and define the nowcast as final wILI on the previous week.
+    #   - Seasonal Naive: define the nowcast as final wILI on the same week
+    #     one year in the past.
+    # Naive Oracle has the disadvantage that it's not realistic (because of
+    # backfill), and therefore it is unfairly advantaged. Seasonal Naive has
+    # the disadvantage that wILI 52 weeks ago is only very loosely correlated
+    # with wILI at runtime, and therefore it is unfairly disadvantaged.
+    # (Ideally we would define the naive nowcast as preliminary wILI on the
+    # previous week, but that data isn't generally available, except for
+    # certain locations and seasons.)
+    # It's not immediately clear which definition of "naive" is better in this
+    # situation. The variable below controls which definition is used
+    # throughout this analysis; 1 corresponds to Naive Oracle, and 52
+    # corresponds to Seasonal Naive.
+    delta = 1
+
     nowcast = {}
     truth = self.get_truth(loc)
     for ew1 in truth:
-      ew0 = Epiweek.add_epiweeks(ew1, -52)
+      ew0 = Epiweek.add_epiweeks(ew1, -delta)
       if ew0 in truth:
         nowcast[ew1] = truth[ew0]
     return nowcast
 
   def get_alternative_nowcast(self, loc):
+    # For each week, report the median value of all sensor readings in this
+    # location, ignoring sensor readings in all other locations. This is a
+    # basic "wisdom of the crowd" approach to nowcasting.
     sensors = {}
     for sensor in FluDataSource.SENSORS:
       sensors[sensor] = self.get_sensor(sensor, loc)
