@@ -79,29 +79,45 @@ class Analysis:
   def get_nowcast(self, loc):
     return self.get_experiment('vanilla', loc)
 
-  def merge(self, a, b):
-    return dict((ew, (a[ew], b[ew])) for ew in a.keys() & b.keys())
-
-  def get_stats(self, merged):
-    a = np.array([merged[ew][0] for ew in sorted(merged)])
-    b = np.array([merged[ew][1] for ew in sorted(merged)])
-    mae = np.mean(np.abs(a - b))
-
-    # normalize MAE by MAE of naive nowcaster
-    naive = []
-    for ew1 in merged:
+  def get_naive_nowcast(self, loc):
+    nowcast = {}
+    truth = self.get_truth(loc)
+    for ew1 in truth:
       ew0 = Epiweek.add_epiweeks(ew1, -52)
-      if ew0 in merged:
-        naive.append(np.abs(merged[ew1][0] - merged[ew0][0]))
-    mae_naive = np.mean(naive)
+      if ew0 in truth:
+        nowcast[ew1] = truth[ew0]
+    return nowcast
 
-    return {
-      'n': len(merged),
+  def get_alternative_nowcast(self, loc):
+    sensors = {}
+    for sensor in FluDataSource.SENSORS:
+      sensors[sensor] = self.get_sensor(sensor, loc)
+    nowcast = {}
+    for ew in self.get_truth(loc):
+      values = []
+      for sensor in FluDataSource.SENSORS:
+        if ew in sensors[sensor]:
+          values.append(sensors[sensor][ew])
+      if values:
+        nowcast[ew] = np.median(values)
+    return nowcast
+
+  def get_metrics(self, truth, nowcast, naive=None):
+    common_weeks = sorted(truth.keys() & nowcast.keys())
+    a = np.array([truth[ew] for ew in common_weeks])
+    b = np.array([nowcast[ew] for ew in common_weeks])
+    result = {
+      'n': len(common_weeks),
       'rmse': np.sqrt(np.mean(np.square(a - b))),
-      'mae': mae,
-      'mae_naive': mae_naive,
-      'mase': mae / mae_naive,
+      'mae': np.mean(np.abs(a - b)),
     }
+    if naive is not None:
+      common_weeks = sorted(nowcast.keys() & naive.keys())
+      trimmed_naive = dict([(ew, naive[ew]) for ew in common_weeks])
+      result_naive = self.get_metrics(truth, trimmed_naive)
+      result['mase'] = result['mae'] / result_naive['mae']
+      result['rmsse'] = result['rmse'] / result_naive['rmse']
+    return result
 
   def get_heatmap_data(self):
     w0s, w1s = [], []
@@ -132,7 +148,7 @@ def main():
 
   analysis = Analysis()
 
-  if name == 'nowcast_info':
+  if name in ('all', 'nowcast_info'):
     n = analysis.get_nowcast('nat')
     print('num national nowcasts: %d' % len(n))
     print('first week: %d' % min(n))
@@ -142,7 +158,8 @@ def main():
       t += len(analysis.get_nowcast(l))
     print('total num nowcasts: %d' % t)
     print('num locations: %d' % len(Locations.region_list))
-  elif name == 'sensor_info':
+
+  if name in ('all', 'sensor_info'):
     grand_total = 0
     for s in FluDataSource.SENSORS:
       print('%s:' % s)
@@ -158,7 +175,8 @@ def main():
         grand_total += n
       print('  num locations: %d' % num_loc)
     print('total num readings: %d' % grand_total)
-  elif name == 'plot':
+
+  if name in ('all', 'plot'):
     plotter = UglyPlot(analysis)
     plotter.plot_sensor_heatmap()
     plotter.plot_all_nowcasts()
@@ -166,8 +184,31 @@ def main():
     plotter.plot_accuracy_vs_ablation()
     plotter.plot_accuracy_vs_abscission()
     plotter.plot_all_mase()
-  else:
-    raise Exception('unknown analysis: %s' % name)
+
+  if name in ('all', 'table'):
+    fmt = '%s' + ' & %.3f' * 10 + ' \\\\ \\hline'
+    for loc in Locations.region_list:
+      t = analysis.get_truth(loc)
+      n_actual = analysis.get_nowcast(loc)
+      n_alt = analysis.get_alternative_nowcast(loc)
+      n_naive = analysis.get_naive_nowcast(loc)
+      st_actual = analysis.get_metrics(t, n_actual, naive=n_naive)
+      st_alt = analysis.get_metrics(t, n_alt, naive=n_naive)
+      st_naive = analysis.get_metrics(t, n_naive, naive=n_naive)
+      args = [
+        loc,
+        st_actual['mae'],
+        st_alt['mae'],
+        st_naive['mae'],
+        st_actual['mase'],
+        st_alt['mase'],
+        st_actual['rmse'],
+        st_alt['rmse'],
+        st_naive['rmse'],
+        st_actual['rmsse'],
+        st_alt['rmsse'],
+      ]
+      print(fmt % tuple(args))
 
 
 if __name__ == '__main__':

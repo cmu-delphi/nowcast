@@ -76,15 +76,12 @@ class UglyPlot:
       t = self.analysis.get_truth(loc)
       n = self.analysis.get_nowcast(loc)
       s = self.analysis.get_sensor(sensor, loc)
-      ns = self.analysis.merge(n, s)
-      t = dict((w, t[w]) for w in ns.keys())
-      n = dict((w, n[w]) for w in ns.keys())
-      s = dict((w, s[w]) for w in ns.keys())
-      ts = self.analysis.merge(t, s)
-      tn = self.analysis.merge(t, n)
+      common = n.keys() & s.keys()
+      n = dict((w, n[w]) for w in common)
+      s = dict((w, s[w]) for w in common)
 
-      st_s = self.analysis.get_stats(ts)
-      st_n = self.analysis.get_stats(tn)
+      st_s = self.analysis.get_metrics(t, s)
+      st_n = self.analysis.get_metrics(t, n)
       if st_s['n'] != st_n['n']:
         raise Exception()
 
@@ -106,15 +103,12 @@ class UglyPlot:
       t = self.analysis.get_truth(loc)
       n = self.analysis.get_nowcast(loc)
       s = self.analysis.get_experiment('ablate_%s' % sensor, loc)
-      ns = self.analysis.merge(n, s)
-      t = dict((w, t[w]) for w in ns.keys())
-      n = dict((w, n[w]) for w in ns.keys())
-      s = dict((w, s[w]) for w in ns.keys())
-      ts = self.analysis.merge(t, s)
-      tn = self.analysis.merge(t, n)
+      common = n.keys() & s.keys()
+      n = dict((w, n[w]) for w in common)
+      s = dict((w, s[w]) for w in common)
 
-      st_s = self.analysis.get_stats(ts)
-      st_n = self.analysis.get_stats(tn)
+      st_s = self.analysis.get_metrics(t, s)
+      st_n = self.analysis.get_metrics(t, n)
       if st_s['n'] != st_n['n']:
         raise Exception()
 
@@ -137,13 +131,9 @@ class UglyPlot:
     a_r = self.analysis.get_experiment('abscise2_regional', loc)
     a_s = self.analysis.get_experiment('abscise2_state', loc)
 
-    tvn = self.analysis.merge(tru, a_n)
-    tvr = self.analysis.merge(tru, a_r)
-    tvs = self.analysis.merge(tru, a_s)
-
-    st_n = self.analysis.get_stats(tvn)
-    st_r = self.analysis.get_stats(tvr)
-    st_s = self.analysis.get_stats(tvs)
+    st_n = self.analysis.get_metrics(tru, a_n)
+    st_r = self.analysis.get_metrics(tru, a_r)
+    st_s = self.analysis.get_metrics(tru, a_s)
     if st_n['n'] != st_r['n'] or st_n['n'] != st_s['n']:
       raise Exception()
 
@@ -182,8 +172,8 @@ class UglyPlot:
         '#8080e0'][idx])
       ft = self.analysis.get_truth(loc)
       nc = self.analysis.get_nowcast(loc)
-      merged = self.analysis.merge(ft, nc)
-      st = self.analysis.get_stats(merged)
+      naive = self.analysis.get_naive_nowcast(loc)
+      st = self.analysis.get_metrics(ft, nc, naive=naive)
       nums.append(st['mase'])
     idx = list(range(len(nums)))
     plt.bar(idx, nums, color=colors)
