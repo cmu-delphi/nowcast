@@ -514,14 +514,31 @@ Although the units of ground truth (i.e. wILI) are the same in all locations,
 the normal range of wILI varies between locations. To facilitate comparison
 between locations, we also report mean absolute scaled error (MASE)
 \cite{hyndman2006another}. MASE is the MAE of a given nowcast normalized by the
-MAE of a naive nowcast in the same location. We define the naive nowcast for
-any given location on any given week as the reported ground truth in the same
-location 52 weeks earlier. Using the same notation as above, and considering
-the $m$ weeks for which ground truth is available for at least 52 weeks prior,
-MASE is defined as:
+MAE of a one-step naive nowcast computed in-sample in the same location.
+
+Because wILI is subject to revision over multiple months, a real-time naive
+nowcast would be defined as \textit{preliminary} wILI on the preceding week.
+However, preliminary versions of wILI are not generally known today (except for
+within a narrow set of locations and seasons). As a result, we introduce the
+``Naive Oracle'' nowcaster. This assumes (incorrectly) that the final version
+of wILI is known with no delay and defines the naive nowcast as \textit{final}
+wILI on the preceding week. Since this information is not available at runtime,
+the Naive Oracle is unfairly advantaged. As such, MASE is reasonably subject to
+being greater than one, indicating that the nowcast under consideration
+performed \textit{worse} than the ``naive'' nowcast. This should be
+unsurprising, if not expected, given that the Naive Oracle incorporates
+information which is not available at runtime. In any case, MASE is a useful
+measure for comparing the performance of a given nowcast across different
+locations.
+
+Given the above discussion of the Naive Oracle, we define the naive nowcast for
+any given location on any given week as the final value of ground truth in the
+same location one week earlier. Using the same notation as above, and
+considering the $m$ weeks for which ground truth is available on the prior
+week, MASE is defined as:
 
 \begin{align*}
-  \text{MASE} &= \text{MAE} \left( \frac{1}{m} \sum_{w=1}^m{\left|x_w - x_{w - 52}\right|} \right) ^ {-1}
+  \text{MASE} &= \text{MAE} \left( \frac{1}{m} \sum_{w=1}^m{\left|x_w - x_{w - 1}\right|} \right) ^ {-1}
 \end{align*}
 
 % Results and Discussion can be combined.
