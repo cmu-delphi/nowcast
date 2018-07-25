@@ -1,5 +1,6 @@
 import argparse
 import csv
+import functools
 import glob
 import os
 
@@ -160,6 +161,25 @@ class Analysis:
 
     return data, FluDataSource.SENSORS, weeks
 
+  @functools.lru_cache()
+  def get_accuracy_table(self):
+    result = {}
+    for loc in Locations.region_list:
+      t = self.get_truth(loc)
+      n_actual = self.get_nowcast(loc)
+      n_alt = self.get_alternative_nowcast(loc)
+      n_naive = self.get_naive_nowcast(loc)
+      st_actual = self.get_metrics(t, n_actual, naive=n_naive)
+      st_alt = self.get_metrics(t, n_alt, naive=n_naive)
+      result[loc] = {
+        'actual_mae': st_actual['mae'],
+        'actual_rmse': st_actual['rmse'],
+        'actual_mase': st_actual['mase'],
+        'alt_mae': st_alt['mae'],
+        'alt_rmse': st_alt['rmse'],
+      }
+    return result
+
 
 def main():
   parser = argparse.ArgumentParser()
@@ -209,29 +229,29 @@ def main():
     plotter.plot_all_mase()
 
   if name in ('all', 'table'):
-    fmt = '%s' + ' & %.3f' * 10 + ' \\\\ \\hline'
-    for loc in Locations.region_list:
-      t = analysis.get_truth(loc)
-      n_actual = analysis.get_nowcast(loc)
-      n_alt = analysis.get_alternative_nowcast(loc)
-      n_naive = analysis.get_naive_nowcast(loc)
-      st_actual = analysis.get_metrics(t, n_actual, naive=n_naive)
-      st_alt = analysis.get_metrics(t, n_alt, naive=n_naive)
-      st_naive = analysis.get_metrics(t, n_naive, naive=n_naive)
-      args = [
-        loc,
-        st_actual['mae'],
-        st_alt['mae'],
-        st_naive['mae'],
-        st_actual['mase'],
-        st_alt['mase'],
-        st_actual['rmse'],
-        st_alt['rmse'],
-        st_naive['rmse'],
-        st_actual['rmsse'],
-        st_alt['rmsse'],
-      ]
-      print(fmt % tuple(args))
+    filename = 'data/files/table.csv'
+    print('saving %s' % filename)
+    with open(filename, 'w') as f:
+      writer = csv.writer(f)
+      writer.writerow([
+        'Location',
+        'MAE Actual',
+        'MAE Baseline',
+        'RMSE Actual',
+        'RMSE Baseline',
+        'MASE Actual',
+      ])
+      table = analysis.get_accuracy_table()
+      for loc in Locations.region_list:
+        writer.writerow([
+          loc,
+          '%.3f' % table[loc]['actual_mae'],
+          '%.3f' % table[loc]['alt_mae'],
+          '%.3f' % table[loc]['actual_rmse'],
+          '%.3f' % table[loc]['alt_rmse'],
+          '%.3f' % table[loc]['actual_mase'],
+        ])
+    print('saved %s' % filename)
 
 
 if __name__ == '__main__':
