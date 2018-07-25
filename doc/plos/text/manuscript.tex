@@ -527,15 +527,14 @@ the Naive Oracle is unfairly advantaged. As such, MASE is reasonably subject to
 being greater than one, indicating that the nowcast under consideration
 performed \textit{worse} than the ``naive'' nowcast. This should be
 unsurprising, if not expected, given that the Naive Oracle incorporates
-information which is not available at runtime. In any case, MASE is a useful
-measure for comparing the performance of a given nowcast across different
-locations.
+information which is not available at runtime. In any case, while MASE is not
+particularly helpful as an absolute measure of accuracy, MASE is useful for
+comparing relative accuracy between different locations.
 
-Given the above discussion of the Naive Oracle, we define the naive nowcast for
-any given location on any given week as the final value of ground truth in the
-same location one week earlier. Using the same notation as above, and
-considering the $m$ weeks for which ground truth is available on the prior
-week, MASE is defined as:
+We define the naive nowcast for any given location on any given week as the
+final value of ground truth in the same location one week earlier. Using the
+same notation as above, and considering the $m$ weeks for which ground truth is
+available on the prior week, MASE is defined as:
 
 \begin{align*}
   \text{MASE} &= \text{MAE} \left( \frac{1}{m} \sum_{w=1}^m{\left|x_w - x_{w - 1}\right|} \right) ^ {-1}
