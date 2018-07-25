@@ -499,11 +499,11 @@ data. We subsequently use the shrunken matrix as $R$ in sensor fusion.
 
 \subsection*{Evaluation}
 
-In a given location over a given period of time, we assess the standalone
-accuracy of a nowcast by two measures: mean absolute error (MAE) root mean
-squared error (RMSE). With ground truth vector $\vec{x}$, nowcast vector
-$\vec{y}$, and elements indexed by week $w$ of $n$, these measures are defined
-as:
+In a given location over a given period of time, we assess the absolute
+(scale-dependent) error of a nowcast by two measures: mean absolute error (MAE)
+and root mean squared error (RMSE). With ground truth vector $\vec{x}$, nowcast
+vector $\vec{y}$, and elements indexed by week $w$ of $n$, these measures are
+defined as:
 
 \begin{align*}
   \text{MAE} &= \frac{1}{n} \sum_{w=1}^n{\left|x_w - y_w\right|} \\
@@ -511,32 +511,40 @@ as:
 \end{align*}
 
 Although the units of ground truth (i.e. wILI) are the same in all locations,
-the normal range of wILI varies between locations. To facilitate comparison
-between locations, we also report mean absolute scaled error (MASE)
-\cite{hyndman2006another}. MASE is the MAE of a given nowcast normalized by the
-MAE of a one-step naive nowcast computed in-sample in the same location.
+the normal range of wILI varies between locations. To facilitate aggregation
+and comparison among locations, we report several relative (scale-independent)
+error measures with respect to various baselines. Each of these is computed by
+normalizing nowcast error by the same type of error measured on the output of a
+baseline model. Here we define two such baseline models: ``naive'' and
+``simple''.
 
 Because wILI is subject to revision over multiple months, a real-time naive
 nowcast would be defined as \textit{preliminary} wILI on the preceding week.
 However, preliminary versions of wILI are not generally known today (except for
-within a narrow set of locations and seasons). As a result, we introduce the
-``Naive Oracle'' nowcaster. This assumes (incorrectly) that the final version
+within a narrow set of locations and seasons). As a result, we introduce a
+``naive oracle'' nowcaster. This assumes (incorrectly) that the final version
 of wILI is known with no delay and defines the naive nowcast as \textit{final}
 wILI on the preceding week. Since this information is not available at runtime,
-the Naive Oracle is unfairly advantaged. As such, MASE is reasonably subject to
-being greater than one, indicating that the nowcast under consideration
-performed \textit{worse} than the ``naive'' nowcast. This should be
-unsurprising, if not expected, given that the Naive Oracle incorporates
-information which is not available at runtime. In any case, while MASE is not
-particularly helpful as an absolute measure of accuracy, MASE is useful for
-comparing relative accuracy between different locations.
+the naive baseline is unfairly advantaged.
 
-We define the naive nowcast for any given location on any given week as the
-final value of ground truth in the same location one week earlier. Using the
-same notation as above, and considering the $m$ weeks for which ground truth is
-available on the prior week, MASE is defined as:
+The ``simple'' baseline is defined as the median of all sensor readings for a
+given location, ignoring sensor readings elsewhere. This is in effect a wisdom
+of the crowd nowcast that doesn't incorporate information from outside
+locations.
+
+We report MAE of nowcasts relative to MAE of each baseline (RelMAE TODO(cite)).
+In doing so with the ``naive'' baseline, this is a special case of RelMAE known
+as mean absolute scaled error (MASE) \cite{hyndman2006another}. MASE is defined
+in the context of time-series forecasting in general as the MAE of a given forecast
+normalized by the MAE of an in-sample, one-step naive forecast.
+
+Using the same notation as above, assuming $\tilde{z}_w$ represents the median
+sensor reading for the current location on week $w$, and considering the $m$
+weeks for which ground truth is available on the prior week, these measures are
+defined as:
 
 \begin{align*}
+  \text{RelMAE} &= \text{MAE} \left( \frac{1}{n} \sum_{w=1}^n{\left|x_w - \tilde{z}_w\right|} \right) ^ {-1} \\
   \text{MASE} &= \text{MAE} \left( \frac{1}{m} \sum_{w=1}^m{\left|x_w - x_{w - 1}\right|} \right) ^ {-1}
 \end{align*}
 
@@ -655,6 +663,11 @@ values of wILI were used in place of final values.
 \end{figure}
 
 \section*{Discussion}
+
+MASE is reasonably subject to being greater than one, indicating that the
+nowcast under consideration performed \textit{worse} than the ``naive''
+nowcast. This should be unsurprising, if not expected, given that the naive
+oracle incorporates information which is not available at runtime.
 
 TODO
 
