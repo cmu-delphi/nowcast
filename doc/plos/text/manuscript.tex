@@ -688,6 +688,12 @@ accurate than any individual data source.
 
 \subsubsection*{Accuracy relative to baselines}
 
+To assess accuracy at finer geographic resolutions, we report MAE relative to
+the naive and simple baselines (measured as the ratios MASE and RelMAE
+respectively). When aggregating errors over multiple geographic units (e.g.
+states within some region) we report the geometric mean of errors as this
+yields a result that can still be interpreted as a ratio.
+
 TODO (python3 analyze.py metrics)
 
 \section*{Discussion}
