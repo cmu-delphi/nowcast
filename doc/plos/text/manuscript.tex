@@ -663,11 +663,14 @@ data from future weeks was held out.
   \label{figure_all_nowcasts}
 \end{figure}
 
-\subsection*{Accuracy relative to data sources}
+\subsubsection*{Accuracy relative to data sources}
 
-The error (measured in MAE and RMSE) of nowcasts of ILI for the US as a whole
-relative to the same error for each data source are shown in
-Fig~\ref{figure_accuracy_vs_sensors}.
+For the US as a whole, Fig~\ref{figure_accuracy_vs_sensors} compares error
+(measured in MAE and RMSE) between nowcasts and individual data sources. To
+control for the fact that difficulty varies over time, the evaluation is
+performed only over weeks on which the nowcast and the particular data source
+are jointly available. The number of weeks in each such union is indicated in
+each corresponding subpanel.
 
 \begin{figure}[!ht]
   \maybeincludegraphics{accuracy_vs_sensors}
@@ -678,7 +681,12 @@ Fig~\ref{figure_accuracy_vs_sensors}.
   \label{figure_accuracy_vs_sensors}
 \end{figure}
 
-\subsection*{Accuracy relative to baselines}
+In all instances, the nowcast has lower error (both MAE and RMSE) than any
+individual data source, subject to the fitting procedure described above. This
+indicates, at least for the US as a whole, that the nowcast is on average more
+accurate than any individual data source.
+
+\subsubsection*{Accuracy relative to baselines}
 
 TODO (python3 analyze.py metrics)
 
@@ -688,6 +696,11 @@ MASE is reasonably subject to being greater than one, indicating that the
 nowcast under consideration performed \textit{worse} than the ``naive''
 nowcast. This should be unsurprising, if not expected, given that the naive
 oracle incorporates information which is not available at runtime.
+
+That the nowcast is more accurate than its individual inputs should hold in
+general as the outputs of sensor fusion should, on average, have smaller error
+than the inputs. However, this may not hold in all cases due to overfitting or
+violations of the assumptions of linearity and normality.
 
 TODO
 
