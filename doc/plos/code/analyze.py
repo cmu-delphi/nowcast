@@ -171,12 +171,17 @@ class Analysis:
       n_naive = self.get_naive_nowcast(loc)
       st_actual = self.get_metrics(t, n_actual, naive=n_naive)
       st_alt = self.get_metrics(t, n_alt, naive=n_naive)
+      st_naive = self.get_metrics(t, n_naive, naive=n_naive)
       result[loc] = {
         'actual_mae': st_actual['mae'],
         'actual_rmse': st_actual['rmse'],
         'actual_mase': st_actual['mase'],
+        'actual_relmae': st_actual['mae'] / st_alt['mae'],
         'alt_mae': st_alt['mae'],
         'alt_rmse': st_alt['rmse'],
+        'alt_mase': st_alt['mase'],
+        'naive_mae': st_naive['mae'],
+        'naive_rmse': st_naive['rmse'],
       }
     return result
 
@@ -237,9 +242,12 @@ def main():
         'Location',
         'MAE Actual',
         'MAE Baseline',
+        'MAE Naive',
         'RMSE Actual',
         'RMSE Baseline',
+        'RMSE Naive',
         'MASE Actual',
+        'MASE Baseline',
       ])
       table = analysis.get_accuracy_table()
       for loc in Locations.region_list:
@@ -247,11 +255,77 @@ def main():
           loc,
           '%.3f' % table[loc]['actual_mae'],
           '%.3f' % table[loc]['alt_mae'],
+          '%.3f' % table[loc]['naive_mae'],
           '%.3f' % table[loc]['actual_rmse'],
           '%.3f' % table[loc]['alt_rmse'],
+          '%.3f' % table[loc]['naive_rmse'],
           '%.3f' % table[loc]['actual_mase'],
+          '%.3f' % table[loc]['alt_mase'],
         ])
     print('saved %s' % filename)
+
+  if name in ('all', 'metrics'):
+    table = analysis.get_accuracy_table()
+    rel = {'mae': {}, 'rmse': {}, 'mase': {}}
+    for loc in Locations.region_list:
+      rel['mae'][loc] = table[loc]['actual_mae'] / table[loc]['alt_mae']
+      rel['rmse'][loc] = table[loc]['actual_rmse'] / table[loc]['alt_rmse']
+      rel['mase'][loc] = table[loc]['actual_mase']
+
+    def geo_mean(locs, metric):
+      acc = 1
+      for loc in locs:
+        acc *= metric[loc]
+      return acc ** (1 / len(locs))
+
+    def geo_mean_str(locs, metric):
+      return '%.3f (n=%d)' % (geo_mean(locs, metric), len(locs))
+
+    atoms_plus_ny = Locations.ny_state_list + Locations.atom_list
+    print('nat gm RelMAE: %s' % geo_mean_str(Locations.nat_list, rel['mae']))
+    print('cen gm RelMAE: %s' % geo_mean_str(Locations.cen_list, rel['mae']))
+    print('hhs gm RelMAE: %s' % geo_mean_str(Locations.hhs_list, rel['mae']))
+    print('a+ny gm RelMAE: %s' % geo_mean_str(atoms_plus_ny, rel['mae']))
+
+    print('nat gm RelRMSE: %s' % geo_mean_str(Locations.nat_list, rel['rmse']))
+    print('cen gm RelRMSE: %s' % geo_mean_str(Locations.cen_list, rel['rmse']))
+    print('hhs gm RelRMSE: %s' % geo_mean_str(Locations.hhs_list, rel['rmse']))
+    print('a+ny gm RelRMSE: %s' % geo_mean_str(atoms_plus_ny, rel['rmse']))
+
+    print('nat gm MASE: %s' % geo_mean_str(Locations.nat_list, rel['mase']))
+    print('cen gm MASE: %s' % geo_mean_str(Locations.cen_list, rel['mase']))
+    print('hhs gm MASE: %s' % geo_mean_str(Locations.hhs_list, rel['mase']))
+    print('a+ny gm MASE: %s' % geo_mean_str(atoms_plus_ny, rel['mase']))
+
+    for reg in Locations.nat_list:
+      val = geo_mean_str(Locations.nat_map[reg], rel['mae'])
+      print('atoms in %s gm RelMAE: %s' % (reg, val))
+    for reg in Locations.nat_list:
+      val = geo_mean_str(Locations.nat_map[reg], rel['rmse'])
+      print('atoms in %s gm RelRMSE: %s' % (reg, val))
+    for reg in Locations.nat_list:
+      val = geo_mean_str(Locations.nat_map[reg], rel['mase'])
+      print('atoms in %s gm MASE: %s' % (reg, val))
+
+    for reg in Locations.hhs_list:
+      val = geo_mean_str(Locations.hhs_map[reg], rel['mae'])
+      print('atoms in %s gm RelMAE: %s' % (reg, val))
+    for reg in Locations.hhs_list:
+      val = geo_mean_str(Locations.hhs_map[reg], rel['rmse'])
+      print('atoms in %s gm RelRMSE: %s' % (reg, val))
+    for reg in Locations.hhs_list:
+      val = geo_mean_str(Locations.hhs_map[reg], rel['mase'])
+      print('atoms in %s gm MASE: %s' % (reg, val))
+
+    for reg in Locations.cen_list:
+      val = geo_mean_str(Locations.cen_map[reg], rel['mae'])
+      print('atoms in %s gm RelMAE: %s' % (reg, val))
+    for reg in Locations.cen_list:
+      val = geo_mean_str(Locations.cen_map[reg], rel['rmse'])
+      print('atoms in %s gm RelRMSE: %s' % (reg, val))
+    for reg in Locations.cen_list:
+      val = geo_mean_str(Locations.cen_map[reg], rel['mase'])
+      print('atoms in %s gm MASE: %s' % (reg, val))
 
 
 if __name__ == '__main__':
