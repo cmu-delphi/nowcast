@@ -535,8 +535,8 @@ locations.
 We report MAE of nowcasts relative to MAE of each baseline (RelMAE TODO(cite)).
 In doing so with the ``naive'' baseline, this is a special case of RelMAE known
 as mean absolute scaled error (MASE) \cite{hyndman2006another}. MASE is defined
-in the context of time-series forecasting in general as the MAE of a given forecast
-normalized by the MAE of an in-sample, one-step naive forecast.
+in the context of time-series forecasting in general as the MAE of a given
+forecast normalized by the MAE of an in-sample, one-step naive forecast.
 
 Using the same notation as above, assuming $\tilde{z}_w$ represents the median
 sensor reading for the current location on week $w$, and considering the $m$
@@ -647,9 +647,10 @@ regions, the 9 census divisions, the 50 states, the District of Columbia,
 Puerto Rico, the US Virgin Islands, New York City, and New York state
 \textit{excluding} New York City. Fig~\ref{figure_all_nowcasts} shows a
 time-series comparison of all nowcasts with ground truth. Although these
-nowcasts were computed in retrospect, models were trained using only data that
-would have been available at the time. Namely, whenever possible, preliminary
-values of wILI were used in place of final values.
+nowcasts were computed in retrospect, models were trained whenever possible
+using only data that would have been available at the time. For any given week,
+preliminary values of wILI (when known) were used in place of final values, and
+data from future weeks was held out.
 
 \begin{figure}[!ht]
   \maybeincludegraphics{all_nowcasts}
@@ -661,6 +662,25 @@ values of wILI were used in place of final values.
   }
   \label{figure_all_nowcasts}
 \end{figure}
+
+\subsection*{Accuracy relative to data sources}
+
+The error (measured in MAE and RMSE) of nowcasts of ILI for the US as a whole
+relative to the same error for each data source are shown in
+Fig~\ref{figure_accuracy_vs_sensors}.
+
+\begin{figure}[!ht]
+  \maybeincludegraphics{accuracy_vs_sensors}
+  \caption{
+    {\bf Nowcast error compared with sensor error.}
+    TODO: explain this
+  }
+  \label{figure_accuracy_vs_sensors}
+\end{figure}
+
+\subsection*{Accuracy relative to baselines}
+
+TODO (python3 analyze.py metrics)
 
 \section*{Discussion}
 
