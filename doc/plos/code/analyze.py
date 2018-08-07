@@ -327,6 +327,19 @@ def main():
       val = geo_mean_str(Locations.cen_map[reg], rel['mase'])
       print('atoms in %s gm MASE: %s' % (reg, val))
 
+    def print_row(name, locs):
+      n = len(locs)
+      mase = geo_mean(locs, rel['mase'])
+      relmae = geo_mean(locs, rel['mae'])
+      print('%s (%d) & %.3f & %.3f \\\\ \\hline' % (name, n, mase, relmae))
+    print('-' * 20)
+    print_row('US National', Locations.nat_list)
+    print_row('Census Divisions', Locations.cen_list)
+    print_row('HHS Regions', Locations.hhs_list)
+    for reg in Locations.hhs_list:
+      print_row('States in %s' % reg.upper(), Locations.hhs_map[reg])
+    print_row('All States', Locations.atom_list)
+
 
 if __name__ == '__main__':
   main()
