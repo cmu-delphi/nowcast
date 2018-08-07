@@ -692,9 +692,45 @@ To assess accuracy at finer geographic resolutions, we report MAE relative to
 the naive and simple baselines (measured as the ratios MASE and RelMAE
 respectively). When aggregating errors over multiple geographic units (e.g.
 states within some region) we report the geometric mean of errors as this
-yields a result that can still be interpreted as a ratio.
+yields a result that can still be interpreted as a ratio. The relative errors
+are summarized in Table~\ref{table_relative_metrics}.
 
-TODO (python3 analyze.py metrics)
+% python3 analyze.py metrics
+\begin{table}[!ht]
+  \centering
+  \caption{{\bf Relative error across sets of locations.}}
+  \begin{tabular}{|l|l|l|}
+    \hline
+    {\bf Locations (n)} & {\bf G.M. MASE} & {\bf G.M. RelMAE}\\ \thickhline
+    US National (1) & 0.667 & 0.799 \\ \hline
+    Census Divisions (9) & 0.853 & 0.859 \\ \hline
+    HHS Regions (10) & 0.865 & 0.849 \\ \hline
+    Atoms in HHS1 (6) & 0.960 & 0.918 \\ \hline
+    Atoms in HHS2 (5) & 1.094 & 1.068 \\ \hline
+    Atoms in HHS3 (6) & 1.019 & 0.900 \\ \hline
+    Atoms in HHS4 (8) & 0.996 & 0.886 \\ \hline
+    Atoms in HHS5 (6) & 0.955 & 0.912 \\ \hline
+    Atoms in HHS6 (5) & 0.941 & 0.941 \\ \hline
+    Atoms in HHS7 (4) & 0.995 & 0.928 \\ \hline
+    Atoms in HHS8 (6) & 1.029 & 0.991 \\ \hline
+    Atoms in HHS9 (4) & 1.048 & 0.863 \\ \hline
+    Atoms in HHS10 (4) & 1.014 & 0.929 \\ \hline
+    All Atoms (54) & 1.002 & 0.931 \\ \hline
+  \end{tabular}
+  \begin{flushleft}
+    TODO(define atom, enumerate "all atoms", mention naive/simple, define GM)
+  \end{flushleft}
+  \label{table_relative_metrics}
+\end{table}
+
+At the national level, the sensor fusion nowcast has lower error than either
+baseline by a considerable margin. The same is true for Census divisions and
+HHS regions collectively, although the margin is not as large. Aggregated over
+individual atoms, either within a particular region or altogether, the sensor
+fusion nowcast seems to generally be on par with the naive baseline and
+somewhat better than the simple baseline. For atoms within HHS region 2
+specifically, the sensor fusion nowcast has higher overall error than both
+naive and simple baselines.
 
 \section*{Discussion}
 
@@ -708,7 +744,10 @@ general as the outputs of sensor fusion should, on average, have smaller error
 than the inputs. However, this may not hold in all cases due to overfitting or
 violations of the assumptions of linearity and normality.
 
-TODO
+TODO(why is hhs2 the worst? PR/VI: least ground truth, extreme noise, disparate
+dynamics, no sensors other than sar3; NY, JFK: inferred.)
+
+TODO(more discussion)
 
 \section*{Conclusion}
 
