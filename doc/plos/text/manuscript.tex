@@ -732,6 +732,43 @@ somewhat better than the simple baseline. For atoms within HHS region 2
 specifically, the sensor fusion nowcast has higher overall error than both
 naive and simple baselines.
 
+\subsubsection*{Sensitivity to each data source}
+
+Digital surveillance is intermittent by nature, and data sources are subject to
+sporadic, periodic (e.g. EPIC), and permanent (e.g. GFT) periods of
+absence. We expect sensor fusion to gracefully handle these cases, but it is
+not immediately clear what impact the absence of a given data source has on the
+quality of the resulting nowcast.
+
+To explore this question, we compare accuracy of nowcasts with and without each
+data source in a set of eight ``ablation'' experiments in
+Fig~\ref{figure_accuracy_vs_ablation}. For a given data source, we compute the
+US national nowcast with and without that source and compare error in terms of
+MAE and RMSE. Since the difficulty of nowcasting varies over time, we restrict
+these comparisons to the set of weeks on which a particular data source (or,
+more accurately, its fitted sensors) are available.
+
+\begin{figure}[!ht]
+  \maybeincludegraphics{accuracy_vs_ablation}
+  \caption{
+    {\bf Nowcast error compared with and without each data source.}
+    TODO: explain this
+  }
+  \label{figure_accuracy_vs_ablation}
+\end{figure}
+
+As expected, we generally find that removal of a particular data source causes
+an increase (or, in the case of WIKI, no meaningful change) in nowcasting
+error. However, there are a couple of exceptions: TWTR and CDC. Nowcasting
+error \textit{decreases} when removing these data sources. This is unexpected
+in theory and strongly suggests violated assumptions (e.g. the relationship of
+these sources with wILI may be nonlinear) or overfitting (e.g. covariance may
+be underestimated for these sources).
+
+\subsubsection*{Sensitivity to geographic resolution}
+
+TODO(abscission experiments)
+
 \section*{Discussion}
 
 MASE is reasonably subject to being greater than one, indicating that the
@@ -746,6 +783,10 @@ violations of the assumptions of linearity and normality.
 
 TODO(why is hhs2 the worst? PR/VI: least ground truth, extreme noise, disparate
 dynamics, no sensors other than sar3; NY, JFK: inferred.)
+
+TODO(curse of dimensionality and regularization)
+
+TODO(ablation: overfitting, assumptions, time-variable relationships)
 
 TODO(more discussion)
 
