@@ -682,9 +682,10 @@ each corresponding subpanel.
 \end{figure}
 
 In all instances, the nowcast has lower error (both MAE and RMSE) than any
-individual data source, subject to the fitting procedure described above. This
+individual data source after applying the fitting procedure described above. This
 indicates, at least for the US as a whole, that the nowcast is on average more
-accurate than any individual data source.
+accurate than any individual data source (at least for this particular fitting
+procedure).
 
 \subsubsection*{Accuracy relative to baselines}
 
@@ -762,12 +763,43 @@ an increase (or, in the case of WIKI, no meaningful change) in nowcasting
 error. However, there are a couple of exceptions: TWTR and CDC. Nowcasting
 error \textit{decreases} when removing these data sources. This is unexpected
 in theory and strongly suggests violated assumptions (e.g. the relationship of
-these sources with wILI may be nonlinear) or overfitting (e.g. covariance may
-be underestimated for these sources).
+these sources with wILI may be nonlinear or residuals may not be normally
+distributed) or overfitting (e.g. covariance may be underestimated for these
+sources) in practice.
 
 \subsubsection*{Sensitivity to geographic resolution}
 
-TODO(abscission experiments)
+A related question is to what extent the inclusion of geographic ``tiers''
+impacts accuracy of nowcasts. Namely, is it helpful for nowcasting the US
+nationally to include data at the level of regions, states, cities, and
+territories?
+
+To answer this, we similarly compare nowcasting error in terms of MAE and RMSE
+with and without data at regional (Census and HHS) and state (including cities
+and territories) levels. This is difficult to assess for all data sources,
+given that many do not include data at the level of states (or even regions, in
+the case of WIKI). Because of this, we limit the set of data sources to only
+those available at the level of states (and above): GFT, GHT, TWTR, CDCP, and
+SAR3. Again, we restrict the comparison to weeks on which sensors are mutually
+available. The results of these comparisons are summarized in
+Fig~\ref{figure_accuracy_vs_abscission}.
+
+\begin{figure}[!ht]
+  \maybeincludegraphics{accuracy_vs_abscission}
+  \caption{
+    {\bf Nowcast error compared across geographic tiers.}
+    TODO: explain this
+  }
+  \label{figure_accuracy_vs_abscission}
+\end{figure}
+
+Between national-only and national-and-regional nowcasts, we see an increase in
+accuracy (a decrease in both MAE and RMSE), suggesting that higher geographic
+resolution is beneficial to the nowcast. When including all locations, MAE
+further decreases, but RMSE increases. One possible reason for this mixed
+result is poor model fitting (i.e. covariance estimation) induced by a large
+increase in dimensionality with no increase in the number of weekly sensor
+observations.
 
 \section*{Discussion}
 
@@ -798,7 +830,7 @@ TODO
 
 \paragraph*{S1 Text}
 \label{S1_Text}
-{\bf Supporting Information.} Includes derivation and sensitivity analysis.
+{\bf Supporting Information.} Derivation of the sensor fusion kernel.
 
 \section*{Acknowledgments}
 
