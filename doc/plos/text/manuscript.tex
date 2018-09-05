@@ -803,24 +803,67 @@ observations.
 
 \section*{Discussion}
 
-MASE is reasonably subject to being greater than one, indicating that the
-nowcast under consideration performed \textit{worse} than the ``naive''
-nowcast. This should be unsurprising, if not expected, given that the naive
-oracle incorporates information which is not available at runtime.
+We compared nowcasts with two baselines; a naive oracle, which reports
+finalized wILI on the previous week, and a simple method, which reports the
+median sensor reading on a given week. At high geographic resolution (i.e.
+states, territories, and cities), we find that sensor fusion nowcasts are
+cumulatively approximately on par with naive oracle nowcasts and somewhat
+better than simple nowcasts. At lower geographic resolution (i.e. regionally
+and nationally), sensor fusion nowcasts strongly and uniformly outperform both
+baselines.
 
-That the nowcast is more accurate than its individual inputs should hold in
-general as the outputs of sensor fusion should, on average, have smaller error
-than the inputs. However, this may not hold in all cases due to overfitting or
-violations of the assumptions of linearity and normality.
+MASE---error of sensor fusion nowcasts relative to error of the naive
+oracle---is frequently greater than one in small geographic units, indicating
+that the nowcast under consideration performed \textit{worse} than the
+so-called ``naive'' nowcast. This result is not entirely unexpected, given that
+the naive oracle incorporates latent information (namely, finalized ILI) which
+is unavailable to operational nowcasts at runtime.
+
+That the nowcast is more accurate than its individual inputs (i.e. ``sensors'')
+should hold in general as the outputs of sensor fusion should, on average, have
+smaller error than the inputs. Overfitting or violations of the assumptions of
+linearity and normality may cause deviations from this expectation.
+
+We observe such deviations at least twice. First, for the set of five states,
+territories, and cities within HHS region two (``HHS2''), we find that the
+geometric mean of RelMAE---error of sensor fusion nowcasts relative to error of
+the simple baseline---is greater than one, meaning that the baseline
+outperformed the nowcast in these locations. Second, we find that removal of
+certain sensors (``ablation'' and ``abscission'' experiments) causes the
+accuracy of the nowcast to improve. In both of these situations, less data is
+better than more data, against expectation.
+
+Our estimate of the covariance of sensor ``noise'' (residuals w.r.t. ground
+truth) $R$ is necessarily imperfect. Adding additional sensors exponentially
+increases the dimension of the problem without adding new observations---the
+curse of dimensionality. With 367 sensor-location pairs, $R$ has shape $367
+\times 376$; yet in the best case we only have a few hundred observations from
+which to estimate this covariance---often much fewer. Our only recourse is
+aggressive regularization at the expense of covariance accuracy, and therefore
+nowcast accuracy.
+
+Linearity between sensors and ground truth and normality of sensor noise are
+each merely assumed. Violations of these assumptions are neither tested for nor
+acted upon. The sensor fitting procedure simply centers and scales raw data to
+fit ground truth in a least-squares sense. It is possible, if not likely, that
+some sensors are nonlinear w.r.t. ground truth or have non-normal residuals (or
+both). When this is the case, nowcasts will be less accurate; sensor fusion, at
+least as formulated above, operates in terms of linear combinations of
+multivariate normal distributions.
+
+Additionally, we make the implicit assumption that the relationship between
+each sensor and ground truth is constant over time. That is, we assume that the
+bias and variance of residuals are fixed. (In contrast, we explicitly account
+for a time-varying relationship between raw data and ground truth in the sensor
+fitting procedure.) However, this is almost certainly violated in some
+situations; for example, digital surveillance is disproportionately affected
+during periods of heightened traditional and social media coverage of
+outbreaks.
 
 TODO(why is hhs2 the worst? PR/VI: least ground truth, extreme noise, disparate
 dynamics, no sensors other than sar3; NY, JFK: inferred.)
 
-TODO(curse of dimensionality and regularization)
-
-TODO(ablation: overfitting, assumptions, time-variable relationships)
-
-TODO(more discussion)
+TODO: merits and drawbacks of sensor fusion
 
 \section*{Conclusion}
 
