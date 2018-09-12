@@ -836,9 +836,9 @@ better than more data, against expectation.
 Our estimate of the covariance of sensor ``noise'' (residuals w.r.t. ground
 truth) $R$ is necessarily imperfect. Adding additional sensors exponentially
 increases the dimension of the problem without adding new observations---the
-curse of dimensionality. With 367 sensor-location pairs, $R$ has shape $367
-\times 376$; yet in the best case we only have a few hundred observations from
-which to estimate this covariance---often much fewer. Our only recourse is
+curse of dimensionality. With up to 363 sensor-location pairs, $R$ has shape
+$363 \times 363$; yet in the best case we only have a few hundred observations
+from which to estimate this covariance---often much fewer. Our only recourse is
 aggressive regularization at the expense of covariance accuracy, and therefore
 nowcast accuracy.
 
