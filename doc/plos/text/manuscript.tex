@@ -834,13 +834,13 @@ accuracy of the nowcast to improve. In both of these situations, less data is
 better than more data, against expectation.
 
 Our estimate of the covariance of sensor ``noise'' (residuals w.r.t. ground
-truth) $R$ is necessarily imperfect. Adding additional sensors exponentially
+truth) $R$ is necessarily imperfect. Adding additional sensors quadratically
 increases the dimension of the problem without adding new observations---the
 curse of dimensionality. With up to 363 sensor-location pairs, $R$ has shape
-$363 \times 363$; yet in the best case we only have a few hundred observations
-from which to estimate this covariance---often much fewer. Our only recourse is
-aggressive regularization at the expense of covariance accuracy, and therefore
-nowcast accuracy.
+$363 \times 363$; yet in the best case we only have a few hundred weekly
+observations from which to estimate this covariance---often much fewer. Our
+only recourse is aggressive regularization at the expense of covariance
+accuracy, and therefore nowcast accuracy.
 
 Linearity between sensors and ground truth and normality of sensor noise are
 each merely assumed. Violations of these assumptions are neither tested for nor
