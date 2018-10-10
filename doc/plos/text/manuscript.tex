@@ -833,6 +833,16 @@ certain sensors (``ablation'' and ``abscission'' experiments) causes the
 accuracy of the nowcast to improve. In both of these situations, less data is
 better than more data, against expectation.
 
+There are several challenges specific to nowcasting in HHS2 and Census region
+two. First, the constituent territories Puerto Rico (PR) and the US Virgin
+Islands (VI) have limited ground truth---far fewer observations than all other
+locations. Second, the only sensor currently available for each of New York
+\textit{excluding New York City}, PR, and VI is SAR3---a time-series model
+which incorporates no real-world measurements. Finally, the epidemiological
+dynamics (timing, strain distribution, etc.) within HHS2 are disparate; New
+Jersey and New York (including New York City) form one epidemiological cluster
+while PI and VI form another.
+
 Our estimate of the covariance of sensor ``noise'' (residuals w.r.t. ground
 truth) $R$ is necessarily imperfect. Adding additional sensors quadratically
 increases the dimension of the problem without adding new observations---the
@@ -859,9 +869,6 @@ fitting procedure.) However, this is almost certainly violated in some
 situations; for example, digital surveillance is disproportionately affected
 during periods of heightened traditional and social media coverage of
 outbreaks.
-
-TODO(why is hhs2 the worst? PR/VI: least ground truth, extreme noise, disparate
-dynamics, no sensors other than sar3; NY, JFK: inferred.)
 
 TODO: merits and drawbacks of sensor fusion
 
