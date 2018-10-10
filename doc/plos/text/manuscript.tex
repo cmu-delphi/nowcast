@@ -870,7 +870,15 @@ situations; for example, digital surveillance is disproportionately affected
 during periods of heightened traditional and social media coverage of
 outbreaks.
 
-TODO: merits and drawbacks of sensor fusion
+Herein we used a data assimilation technique which we refer to as ``sensor
+fusion''. As a consequence of being derived from the Kalman filter, sensor
+fusion has a number of advantages, including minimizing the expectation of
+squared error, robustness to partial and missing observations, and a natural
+framework for assimilating data across overlapping geographic locations.
+However, sensor fusion ultimately defines a nowcast as a simple linear
+combination of the available sensors. When assumptions of linearity and
+normality are violated, and when covariance estimates are inaccurate, the
+accuracy of resulting nowcasts suffers.
 
 \section*{Conclusion}
 
