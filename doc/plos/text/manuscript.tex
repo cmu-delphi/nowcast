@@ -882,7 +882,29 @@ accuracy of resulting nowcasts suffers.
 
 \section*{Conclusion}
 
-TODO
+Here we took an approach to nowcasting flu in quasi-real-time using a method
+based on the Kalman filter. We used this method to assimilate digital
+surveillance and flu forecasts from eight sources spanning 75 distinct
+locations within the US.
+
+We showed that accuracy of nowcasts almost always outperforms straightforward
+baselines. The advantage of these nowcasts is their extremely low
+latency---they are available up to one week before initial wILI publication.
+
+The primary challenge in incorporating additional data sources is accurately
+estimating sensor noise covariance. The number of weekly observations required
+to estimate covariance at the same resolution grows with the square of the
+number of input sensors. To address this problem, a direction for future work
+is that of sensor selection---perhaps via LASSO.
+
+Another area of future research is to nowcast additional outbreaks in
+additional locations. This, however, depends critically on the availability of
+both a rich history of ground truth and an ongoing set of digital surveillance
+sources.
+
+Finally, in addition to retrospective nowcasts examined here, ongoing nowcasts
+are produced each week and made publicly available both through our website and
+our developer API (TODO: citations).
 
 \section*{Supporting information}
 
