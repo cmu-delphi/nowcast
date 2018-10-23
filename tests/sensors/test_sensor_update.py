@@ -93,7 +93,7 @@ class UnitTests(unittest.TestCase):
 
   def test_get_sensor_implementations(self):
     """Get a map of sensor implementations."""
-    impls = get_sensor_implementations()
+    impls = SensorGetter.get_sensor_implementations()
     self.assertIsInstance(impls, dict)
     self.assertIn('sar3', impls)
     self.assertTrue(callable(impls['sar3']))
