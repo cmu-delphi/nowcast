@@ -494,6 +494,7 @@ class SensorGetter:
       'sar3': SensorGetter.get_sar3,
       'arch': SensorGetter.get_arch,
       'quid': SensorGetter.get_quid,
+      'twiced_twr': SensorGetter.get_twiced_twtr,
     }
 
   @staticmethod
@@ -562,6 +563,11 @@ class SensorGetter:
   def get_quid(location, epiweek, valid):
     fetch, fields = SignalGetter.get_quid(location, epiweek, valid)
     return SensorFitting.fit_loch_ness(location, epiweek, 'quid', fields, fetch, valid)
+
+  @staticmethod
+  def get_twiced_twtr(location, epiweek, valid, data_source=None):
+    fetch = SignalGetter.get_twtr(location, epiweek, valid)
+    return SensorFitting.fit_twicing(location, epiweek, 'twtr', 'percent', fetch, valid, data_source)
 
 
 class SensorUpdate:
