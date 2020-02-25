@@ -205,7 +205,7 @@ class SensorFitting:
     pass
 
   @staticmethod
-  def fit_twicing(location, epiweek, name, fields, fetch, valid):
+  def fit_twicing(location, epiweek, name, fields, fetch, valid, data_source=None):
 
     # Helper functions
     def get_weeks(epiweek):
@@ -308,8 +308,9 @@ class SensorFitting:
       curr_nc = [Epidata.check(maybe_curr_nc)[0]['value']]
     else:
       # produce intermediate nowcast for this week
-      data_source = FluDataSource.new_instance()
-      data_source.prefetch(ew3)
+      if not data_source:
+        data_source = FluDataSource.new_instance()
+        data_source.prefetch(ew3)
       nowcaster = Nowcast(data_source)
       curr_nc_all_loc = nowcaster.batch_nowcast([ew3])[0]
       for loc, val, std in curr_nc_all_loc:
