@@ -48,7 +48,7 @@ class NowcastUpdate:
       last_week = add_epiweeks(first_week, 1)
     return first_week, last_week
 
-  def update(self, first_week, last_week):
+  def update(self, first_week, last_week, bias_correct):
     """Nowcast the given range of weeks and save the result to the database."""
 
     # update the week range if needed
@@ -60,7 +60,7 @@ class NowcastUpdate:
 
     # compute the nowcast(s)
     weeks = list(range_epiweeks(first_week, last_week, inclusive=True))
-    nowcasts = Nowcast(self.data_source).batch_nowcast(weeks)
+    nowcasts = Nowcast(self.data_source).batch_nowcast(weeks, bias_correct)
 
     # save to database
     with self.database as db:
@@ -89,6 +89,11 @@ def get_argument_parser():
       '--test',
       action='store_true',
       help='generate a nowcast but do not write it to the database')
+  parser.add_argument(
+      '--bc',
+      action='store_true',
+      help='perform constant factor bias correction'
+  )
   return parser
 
 
@@ -98,12 +103,12 @@ def validate_args(args):
     raise Exception('`first` and `last` must be used together')
   if args.first and args.first > args.last:
     raise Exception('`first` must be less than or equal to `last`')
-  return args.first, args.last, args.test
+  return args.first, args.last, args.test, args.bc
 
 
-def main(first, last, test):
+def main(first, last, test, bc):
   """Run this script from the command line."""
-  NowcastUpdate.new_instance(test).update(first, last)
+  NowcastUpdate.new_instance(test).update(first, last, bc)
 
 
 if __name__ == '__main__':

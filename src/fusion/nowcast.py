@@ -15,10 +15,12 @@ import itertools
 import numpy as np
 
 # first party
+from delphi.epidata.client.delphi_epidata import Epidata
 from delphi.nowcast.fusion import covariance
 from delphi.nowcast.fusion import fusion
 from delphi.nowcast.fusion.us_fusion import UsFusion
-from delphi.utils.epiweek import split_epiweek
+from delphi.utils.epiweek import split_epiweek, add_epiweeks, range_epiweeks
+
 
 
 class DataSource(abc.ABC):
@@ -249,7 +251,7 @@ class Nowcast:
     # return column definitions and data
     return input_locations, noise, week_reading
 
-  def batch_nowcast(self, test_weeks):
+  def batch_nowcast(self, test_weeks, bias_correct=False):
     """
     Return a list of nowcasts, one for each test week.
 
@@ -280,7 +282,8 @@ class Nowcast:
         'in %d locations' % num_locations,
         'over %d weeks' % num_weeks,
         'spanning %d--%d' % week_range,
-        'with algorithm %s' % cov_impl
+        'with algorithm %s' % cov_impl,
+        'bias correction: %s' % bias_correct
     )
 
     # collect all training and testing data up-front
@@ -306,12 +309,27 @@ class Nowcast:
           self.shrinkage,
           season=season,
           exclude_locations=exclude_locations)
-      weekly_nowcasts.append(nowcast)
+
+      if bias_correct:
+        n_lags = 3
+        w_lags = list(range_epiweeks(add_epiweeks(week, -n_lags), week))
+
+        corrected_nowcast = []
+        for loc, x_hat, stdev in nowcast:
+          rows = Epidata.check(Epidata.nowcast(loc, w_lags))
+          nc_lags = [row['value'] for row in rows]
+          ili_lags = [self.data_source.get_truth_value(w, loc) for w in w_lags]
+          error = np.subtract(ili_lags, nc_lags)
+          corrected_nowcast.append(tuple([loc, x_hat + np.mean(error), stdev]))
+
+        nowcast = tuple(corrected_nowcast)
 
       # show progress
       row = nowcast[0]
       args = (week, row[0], row[1], row[2])
       print('[%d] %s: %.3f (%.3f)' % args)
+
+      weekly_nowcasts.append(nowcast)
 
     # return the list of nowcasts
     return weekly_nowcasts
