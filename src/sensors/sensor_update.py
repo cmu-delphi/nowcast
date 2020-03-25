@@ -22,13 +22,15 @@ The following signals are available:
   - cdc: CDC Page Hits
   - epic: Epicast 1-week-ahead point prediction
   - quid: Flu lab test data
-  - sar3: Seasonal Autoregression (order 3)
+  - sar3: Seasonal Autoregression (order 3) with holidays
   - arch: Best-fit Archetype at 1-week-ahead
+  - ar3: Autoregression (order 3) with holidays
 
 See also:
   - signal_update.py
   - sar3.py
   - arch.py
+  - ar3.py
 """
 # standard library
 import argparse
@@ -43,6 +45,7 @@ import numpy as np
 from delphi.epidata.client.delphi_epidata import Epidata
 from delphi.nowcast.sensors.arch import ARCH
 from delphi.nowcast.sensors.sar3 import SAR3
+from delphi.nowcast.sensors.ar3 import AR3
 from delphi.nowcast.util.sensors_table import SensorsTable
 import delphi.operations.secrets as secrets
 from delphi.utils.epidate import EpiDate
@@ -366,6 +369,7 @@ class SensorGetter:
       'epic': SensorGetter.get_epic,
       'sar3': SensorGetter.get_sar3,
       'arch': SensorGetter.get_arch,
+      'ar3': SensorGetter.get_ar3,
       'quid': SensorGetter.get_quid,
     }
 
@@ -381,6 +385,10 @@ class SensorGetter:
   @staticmethod
   def get_arch(location, epiweek, valid):
     return ARCH(location).predict(epiweek, valid=valid)
+
+  @staticmethod
+  def get_ar3(location, epiweek, valid):
+    return AR3(location).predict(epiweek, valid=valid)
 
   @staticmethod
   def get_ghtj(location, epiweek, valid):
