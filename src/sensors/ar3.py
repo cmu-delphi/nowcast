@@ -12,9 +12,9 @@ intercept term):
 When producing retrospective predictions, great care is taken to only use
 'valid' data: values that would have actually been available at the time.
 However, unstable wILI is only available for recent years and for only some of
-the regions (i.e. not in census regions). During training, SAR3 will fall back
+the regions (i.e. not in census regions). During training, AR3 will fall back
 to stable data if unstable data is unavailable; however, during prediction,
-SAR3 will raise an Exception if unstable data is unavailable.
+AR3 will raise an Exception if unstable data is unavailable.
 
 Note that the epiweek parameter represents the most recently published issue.
 The returned value is a prediction for the following week.
