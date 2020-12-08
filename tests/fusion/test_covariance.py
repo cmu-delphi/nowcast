@@ -11,6 +11,11 @@ import numpy as np
 __test_target__ = 'delphi.nowcast.fusion.covariance'
 
 
+def is_posdef(X):
+  """Return whether the given matrix is positive definite."""
+  return np.min(np.linalg.eigvals(X)) > 0
+
+
 class UnitTests(unittest.TestCase):
   """Basic unit tests."""
 
@@ -35,20 +40,6 @@ class UnitTests(unittest.TestCase):
     # numerator and denominator are symmetric
     self.assertTrue(np.allclose(cov2n, cov2n.T))
     self.assertTrue(np.allclose(cov2d, cov2d.T))
-
-  def test_is_posdef(self):
-    self.assertTrue(is_posdef(np.array([
-      [1, 0],
-      [0, 1],
-    ])))
-    self.assertFalse(is_posdef(np.array([
-      [1, 0],
-      [0, -1],
-    ])))
-    self.assertFalse(is_posdef(np.array([
-      [1, 2],
-      [2, 1],
-    ])))
 
   def test_log_likelihood(self):
     cov = np.eye(3)
