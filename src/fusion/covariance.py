@@ -45,34 +45,6 @@ def nancov(X):
   return tdot(np.nan_to_num(X)), tdot(np.isfinite(X).astype(np.float))
 
 
-def is_posdef(X):
-  """
-  Return whether a matrix is positive definite. Equivalently, return whether
-  all eigenvalues are positive.
-
-  input:
-    X: a square matrix
-
-  output:
-    True or False
-  """
-
-  # Attempting the Cholesky decomposition is ostensibly faster than checking
-  # the magnitude of the smallest eigenvalue, even given the overhead of
-  # exception handling.
-  try:
-    # Scipy is used here instead of numpy because each gives a different result
-    # for certain edge cases. Since the result of this function guards a
-    # subsequent call to scipy (namely, logpdf), the scipy version is used for
-    # consistency. Otherwise, the numpy version may indicate that the matrix is
-    # positive definite, only to then have scipy fail to compute the logpdf.
-    # Both implementations raise the same error type (namely, numpy's
-    # LinAlgError) if the matrix isn't positive definite.
-    return scipy.linalg.cholesky(X) is not None
-  except np.linalg.linalg.LinAlgError:
-    return False
-
-
 def log_likelihood(cov, data):
   """
   Return the log-likelihood of data, given parameters. The mean is assumed to
@@ -86,7 +58,15 @@ def log_likelihood(cov, data):
     log-likelihood in the range (-np.inf, 0)
   """
   mean = np.zeros(cov.shape[0])
-  return np.sum(scipy.stats.multivariate_normal.logpdf(data, mean, cov=cov))
+  try:
+    # Attempt to compute the log likelihood. This will fail with `ValueError`
+    # if the covariance matrix is not positive semidefinite. Otherwise, this
+    # will fail with `LinAlgError` if the covariance matrix is near-singular.
+    return np.sum(scipy.stats.multivariate_normal.logpdf(data, mean, cov=cov))
+  except (ValueError, np.linalg.LinAlgError):
+    # Return log likelihood of negative infinity when the covariance matrix is
+    # not firmly positive definite.
+    return -np.inf
 
 
 class ShrinkageMethod(metaclass=abc.ABCMeta):
@@ -186,9 +166,7 @@ def posdef_max_likelihood_objective(X, shrinkage):
   X0 = np.nan_to_num(X)
 
   # define an objective function, given the data
-  def objective(alpha):
-    cov = shrinkage.get_cov(alpha)
-    return log_likelihood(cov, X0) if is_posdef(cov) else -np.inf
+  objective = lambda alpha: log_likelihood(shrinkage.get_cov(alpha), X0)
 
   # return the objective function
   return objective
